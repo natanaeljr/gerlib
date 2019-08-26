@@ -1,0 +1,82 @@
+image: $CI_REGISTRY/$CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG
+
+stages:
+  - docker:build
+  - docker:deploy
+  - app:build
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  CONTAINER_NAME: ubuntu
+  CONTAINER_TAG: $CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID
+  CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CONTAINER_NAME
+  CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CONTAINER_NAME.$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID.tar
+  CONTAINER_CACHE_FROM: $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$CI_COMMIT_REF_SLUG
+  DOCKERFILE_DIR: .
+
+###################################################################################################
+
+.docker:
+  image: docker:stable
+  services:
+    - name: docker:dind
+      command:
+        - --experimental
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker info
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - Dockerfile
+      - conanfile.txt
+    refs:
+      - branches
+      - tags
+      - api
+      - external
+      - pipelines
+      - pushes
+      - scheduled
+      - triggers
+      - web
+      - merge_requests
+
+docker:build:
+  extends: .docker
+  stage: docker:build
+  script:
+    - if [ -z "$DOCKER_BUILD_CLEAN" ]; then docker pull $CONTAINER_CACHE_FROM || echo -e "\e[31mdocker pull cache failed, ignoring.\e[0m"; fi
+    - docker build $([ -z "$DOCKER_BUILD_CLEAN" ] && echo -n "--cache-from $CONTAINER_CACHE_FROM") --tag $CONTAINER_IMAGE:$CONTAINER_TAG $DOCKERFILE_DIR
+    - docker save --output $CONTAINER_TAR_FILE $CONTAINER_IMAGE:$CONTAINER_TAG
+  artifacts:
+    paths:
+      - $CONTAINER_TAR_FILE
+    expire_in: 1 hour
+
+docker:deploy:
+  extends: .docker
+  stage: docker:deploy
+  script:
+    - docker load --input $CONTAINER_TAR_FILE
+    - docker tag $CONTAINER_IMAGE:$CONTAINER_TAG $CI_REGISTRY/$CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY/$CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG
+  dependencies:
+    - docker:build
+
+###################################################################################################
+
+app:build:
+  stage: app:build
+  script:
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - conan install ..
+  artifacts:
+    paths:
+      - build
+  dependencies: []
+
+###################################################################################################
