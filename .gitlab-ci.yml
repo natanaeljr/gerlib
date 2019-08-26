@@ -8,12 +8,10 @@ stages:
 variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-  CONTAINER_NAME: ubuntu
   CONTAINER_TAG: $CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID
-  CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CONTAINER_NAME
-  CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CONTAINER_NAME.$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID.tar
-  CONTAINER_CACHE_FROM: $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$CI_COMMIT_REF_SLUG
-  DOCKERFILE_DIR: .
+  CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+  CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID.tar
+  CONTAINER_CACHE_FROM: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
 ###################################################################################################
 
@@ -48,7 +46,7 @@ docker:build:
   stage: docker:build
   script:
     - if [ -z "$DOCKER_BUILD_CLEAN" ]; then docker pull $CONTAINER_CACHE_FROM || echo -e "\e[31mdocker pull cache failed, ignoring.\e[0m"; fi
-    - docker build $([ -z "$DOCKER_BUILD_CLEAN" ] && echo -n "--cache-from $CONTAINER_CACHE_FROM") --tag $CONTAINER_IMAGE:$CONTAINER_TAG $DOCKERFILE_DIR
+    - docker build $([ -z "$DOCKER_BUILD_CLEAN" ] && echo -n "--cache-from $CONTAINER_CACHE_FROM") --tag $CONTAINER_IMAGE:$CONTAINER_TAG .
     - docker save --output $CONTAINER_TAR_FILE $CONTAINER_IMAGE:$CONTAINER_TAG
   artifacts:
     paths:
