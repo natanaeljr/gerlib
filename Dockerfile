@@ -15,14 +15,17 @@ RUN cd /tmp \
 
 # Cap'n Proto
 RUN cd /tmp \
-    && curl -LO https://capnproto.org/capnproto-c++-0.7.0.tar.gz \
-    && tar zxf capnproto-c++-0.7.0.tar.gz \
+    && curl -L https://capnproto.org/capnproto-c++-0.7.0.tar.gz | tar zx \
     && cd capnproto-c++-0.7.0 \
-    && ./configure \
+    && ./configure CXXFLAGS="-DHOLES_NOT_SUPPORTED=1" \
     && make -j3 check \
     && make install \
     && cd /tmp \
-    && rm -r capnproto-c++-0.7.0 capnproto-c++-0.7.0.tar.gz
+    && rm -r capnproto-c++-0.7.0
+
+# Workstation
+VOLUME /home/duck/app
+WORKDIR /home/duck/app
 
 # User
 ARG USER_ID=1000
@@ -35,6 +38,9 @@ RUN groupadd -g ${GROUP_ID} duck \
 
 USER duck
 
-# Workstation
-VOLUME /home/duck/app
-WORKDIR /home/duck/app
+# Finish Conan deps installation with new user
+COPY --chown=${USER_ID}:${GROUP_ID} conanfile.txt /tmp
+
+RUN cd /tmp \
+    && conan install . \
+    && rm *
