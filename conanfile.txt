@@ -1,0 +1,7 @@
+[requires]
+gtest/1.8.1@bincrafters/stable
+gsl_microsoft/2.0.0@bincrafters/stable
+libcurl/7.64.1@bincrafters/stable
+
+[generators]
+cmake
