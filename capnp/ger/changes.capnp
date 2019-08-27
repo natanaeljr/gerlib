@@ -1,8 +1,7 @@
-@0x8ad2e1906b690ac
+@0xa4b6ee465f7531b2;
 
 using Cxx = import "/capnp/c++.capnp";
 using Json = import "/capnp/compat/json.capnp";
-
 
 enum ChangeStatus {
   new @0 $Json.name("NEW");

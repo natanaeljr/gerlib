@@ -28,10 +28,9 @@ conan_basic_setup()
 include_directories(${CONAN_INCLUDE_DIRS})
 add_definitions(${CONAN_DEFINES})
 link_libraries(${CONAN_LIBS})
+
 # FMT
-include_directories(third-party/fmt/include)
-add_subdirectory(third-party/fmt)
-link_libraries(fmt)
+find_package(fmt REQUIRED)
 
 #########################################################################################
 # Cap'n Proto
@@ -41,3 +40,11 @@ add_subdirectory(capnp)
 #########################################################################################
 # Library
 #########################################################################################
+
+#########################################################################################
+# Testing
+#########################################################################################
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
+

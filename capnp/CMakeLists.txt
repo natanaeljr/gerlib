@@ -7,9 +7,7 @@ project(ger-capnp LANGUAGES CXX)
 set(GER_CAPNP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(GER_CAPNP_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(GER_CAPNP_FILES
-    gerrit/accounts
-    gerrit/changes
-    util/listmap
+    ger/changes
 )
 
 foreach(capnp_file ${GER_CAPNP_FILES})
@@ -33,9 +31,7 @@ set_source_files_properties(${GER_CAPNP_SRCS} PROPERTIES COMPILE_FLAGS "-Wno-sha
 ##################################################################################################
 # Generate Library from capnp files
 ##################################################################################################
-add_library (${GERCAPNP_LIBRARY} STATIC )
-target_sources(${GERCAPNP_LIBRARY}
-    PRIVATE
+add_library (${GERCAPNP_LIBRARY} STATIC
     ${GER_CAPNP_SRCS}
 )
 target_include_directories(${GERCAPNP_LIBRARY}
