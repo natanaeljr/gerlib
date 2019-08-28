@@ -72,9 +72,12 @@ app:build:
     - mkdir build
     - cd build
     - conan install ..
+    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+    - make
+    - ./bin/test-gerlib
   artifacts:
     paths:
-      - build
+      - build/bin
   dependencies: []
 
 ###################################################################################################
