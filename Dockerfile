@@ -1,13 +1,21 @@
 FROM ubuntu
 
-# Install basic tools
+# Avoid warnings by switching to noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Input Args: set with --build-arg
+ARG USERNAME=duck
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Configure apt and install basic packages
 RUN apt-get update && apt-get install -y \
-    sudo \
-    curl \
-    git \
-    g++ \
-    gdb \
-    cmake
+    curl git sudo \
+    build-essential cmake gdb cppcheck valgrind \
+    # clean up
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Conan
 RUN cd /tmp \
@@ -36,28 +44,27 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -r fmt-6.0.0
 
-# Setup Workstation
-VOLUME /home/duck/gerlib
-WORKDIR /home/duck/gerlib
-
 # Create User
-ARG USER_ID=1000
-ARG GROUP_ID=1000
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID --create-home $USERNAME --no-log-init \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+USER $USERNAME
 
-RUN groupadd -g ${GROUP_ID} duck \
-    && useradd -l -u ${USER_ID} -g duck duck \
-    && echo "duck:duck" | chpasswd \
-    && install -d -m 0755 -o duck -g duck /home/duck \
-    && chown --changes --recursive duck:duck /home/duck \
-    && adduser duck sudo
-
-USER duck
+# Setup Workspace
+VOLUME /home/$USERNAME/gerlib
+WORKDIR /home/$USERNAME/gerlib
 
 # Finish Conan deps installation with new user
-COPY --chown=${USER_ID}:${GROUP_ID} conanfile.txt /tmp
-
+COPY --chown=$USER_UID:$USER_GID conanfile.txt /tmp
 RUN cd /tmp \
     && conan install -s build_type=Debug -s compiler.libcxx=libstdc++11 . --build=missing \
     && conan profile update settings.build_type=Debug default \
     && conan profile update settings.compiler.libcxx=libstdc++11 default \
     && rm *
+
+# Terminal handler
+ENV TERM=xterm-color
+
+# Switch back to dialog for any ad-hoc use of apt-get
+ENV DEBIAN_FRONTEND=

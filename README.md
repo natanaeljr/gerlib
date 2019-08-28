@@ -18,7 +18,7 @@ docker build --tag gerlib . --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(
 **Run container**:
 
 ~~~shell
-docker run -v "$PWD:/home/duck/gerlib" -it gerlib
+docker run --rm -v "$PWD:/home/duck/gerlib" -it gerlib
 ~~~
 
 **Configure and build project**:
