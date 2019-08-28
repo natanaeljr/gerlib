@@ -3,11 +3,6 @@ FROM ubuntu
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Input Args: set with --build-arg
-ARG USERNAME=duck
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-
 # Configure apt and install basic packages
 RUN apt-get update && apt-get install -y \
     curl git sudo \
@@ -43,6 +38,11 @@ RUN cd /tmp \
     && make install \
     && cd /tmp \
     && rm -r fmt-6.0.0
+
+# User Args: set with --build-arg
+ARG USERNAME=duck
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
 # Create User
 RUN groupadd --gid $USER_GID $USERNAME \

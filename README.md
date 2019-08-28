@@ -12,13 +12,13 @@ Development should be done under the docker container which has all needed depen
 **Build image**:
 
 ~~~shell
-docker build --tag gerlib . --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)
+docker build --tag gerlib . --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g)
 ~~~
 
 **Run container**:
 
 ~~~shell
-docker run --rm -v "$PWD:/home/duck/gerlib" -it gerlib
+docker run --name gerlib --rm -v "$PWD:/home/duck/gerlib" -it gerlib
 ~~~
 
 **Configure and build project**:
