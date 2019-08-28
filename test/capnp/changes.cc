@@ -18,7 +18,8 @@ TEST(JsonCodec, ChangeStatus)
     codec.handleByAnnotation<gerrit::ChangeStatus>();
 
     /* Decode ChangeStatus from json */
-    auto orphan = codec.decode<gerrit::ChangeTest>({input.begin(), input.end()}, arena.getOrphanage());
+    auto orphan = codec.decode<gerrit::ChangeTest>({ input.begin(), input.end() },
+                                                   arena.getOrphanage());
     EXPECT_EQ(gerrit::ChangeStatus::MERGED, orphan.getReader().getStatus());
 
     /* Encode ChangeStatus to json */
