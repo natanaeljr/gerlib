@@ -15,31 +15,29 @@ class ChangeStatusTest
     : public ::testing::TestWithParam<std::pair<gerrit::ChangeStatus, std::string_view>> {
 };
 
-INSTANTIATE_TEST_CASE_P(
-    JsonCodec, ChangeStatusTest,
-    ::testing::Values(std::pair{ gerrit::ChangeStatus::NEW, "NEW" },
-                      std::pair{ gerrit::ChangeStatus::MERGED, "MERGED" },
-                      std::pair{ gerrit::ChangeStatus::ABANDONED, "ABANDONED" },
-                      std::pair{ gerrit::ChangeStatus::DRAFT, "DRAFT" }));
+INSTANTIATE_TEST_CASE_P(JsonCodec, ChangeStatusTest,
+                        ::testing::Values(std::pair{ gerrit::ChangeStatus::NEW, "NEW" },
+                                          std::pair{ gerrit::ChangeStatus::MERGED, "MERGED" },
+                                          std::pair{ gerrit::ChangeStatus::ABANDONED, "ABANDONED" },
+                                          std::pair{ gerrit::ChangeStatus::DRAFT, "DRAFT" }));
 
 TEST_P(ChangeStatusTest, EncodeDecode)
 {
-    const gerrit::ChangeStatus kStatus = GetParam().first;
+    const gerrit::ChangeStatus kStatusEnum = GetParam().first;
     const std::string_view kStatusName = GetParam().second;
+    const std::string status_quote = fmt::format("\"{}\"", kStatusName);
 
-    capnp::MallocMessageBuilder arena;
     capnp::JsonCodec codec;
     codec.handleByAnnotation<gerrit::ChangeStatus>();
 
-    /* Decode from JSON to Enum */
-    const std::string in_json = fmt::format(R"({{"status":"{}"}})", kStatusName);
-    auto orphan = codec.decode<gerrit::ChangeTest>({ in_json.data(), in_json.length() },
-                                                   arena.getOrphanage());
-    EXPECT_EQ(kStatus, orphan.getReader().getStatus());
+    { /* Decode from JSON to Enum */
+        auto status_enum = codec.decode({ status_quote.data(), status_quote.length() },
+                                        capnp::EnumSchema::from<gerrit::ChangeStatus>());
+        EXPECT_EQ(kStatusEnum, status_enum.as<gerrit::ChangeStatus>());
+    }
 
-    /* Encode Enum to JSON */
-    auto builder = arena.initRoot<gerrit::ChangeTest>();
-    builder.setStatus(kStatus);
-    auto out_json = codec.encode(builder);
-    EXPECT_STREQ(fmt::format(R"({{"status":"{}"}})", kStatusName).c_str(), out_json.cStr());
+    { /* Encode Enum to JSON */
+        auto status_json = codec.encode(kStatusEnum);
+        EXPECT_STREQ(status_quote.c_str(), status_json.cStr());
+    }
 }

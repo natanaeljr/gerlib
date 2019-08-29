@@ -11,7 +11,3 @@ enum ChangeStatus {
   abandoned @2 $Json.name("ABANDONED");
   draft @3 $Json.name("DRAFT");
 }
-
-struct ChangeTest {
-  status @0 :ChangeStatus;
-}
