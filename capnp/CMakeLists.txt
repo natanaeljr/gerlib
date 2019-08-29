@@ -41,9 +41,9 @@ target_include_directories(${GERCAPNP_LIBRARY}
 )
 target_link_libraries(${GERCAPNP_LIBRARY}
     PRIVATE
-    capnp-json
-    capnp-rpc
-    capnp
-    kj
+    libcapnp-json.a
+    libcapnp-rpc.a
+    libcapnp.a
+    libkj.a
 )
 add_dependencies (${GERCAPNP_LIBRARY} ger_capnp_files)

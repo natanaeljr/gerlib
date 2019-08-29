@@ -12,7 +12,7 @@ add_executable(${GERLIB_TEST}
 
 target_link_libraries(${GERLIB_TEST}
     ${GERCAPNP_LIBRARY}
-    fmt
+    libfmt.a
 )
 
 set_target_properties(${GERLIB_TEST} PROPERTIES
