@@ -1,5 +1,4 @@
 use crate::http;
-use failure::_core::fmt::Formatter;
 use std::fmt::Display;
 
 #[derive(Debug)]
@@ -17,7 +16,7 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Error::UnexpectedHttpResponse(code) => {
                 write!(f, "Unexpected HTTP response code: {}", code)

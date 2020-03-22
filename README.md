@@ -1,5 +1,7 @@
-Gerrit command-line interface
+gerlib
 ===
+
+Rust client library for Gerrit Code Review API.
 
 v0.1.0
 
