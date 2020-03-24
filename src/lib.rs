@@ -5,8 +5,8 @@ extern crate strum;
 extern crate strum_macros;
 
 use crate::changes::{
-    AbandonInput, AdditionalOpt, ChangeInfo, ChangeInput, MoveInput, QueryParams, RebaseInput,
-    RestoreInput, RevertInput, SubmitInput, TopicInput,
+    AbandonInput, AdditionalOpt, ChangeInfo, ChangeInput, CommentInfo, MoveInput, QueryParams,
+    RebaseInput, RestoreInput, RevertInput, SubmitInput, TopicInput,
 };
 use crate::handler::RestHandler;
 use crate::http::HttpRequestHandler;
@@ -14,6 +14,7 @@ use ::http::StatusCode;
 use url::Url;
 
 pub use crate::http::AuthMethod as HttpAuthMethod;
+use std::collections::BTreeMap;
 
 pub mod accounts;
 pub mod changes;
@@ -158,6 +159,17 @@ impl GerritRestApi {
         let json = self.rest.get_json(&url, StatusCode::OK)?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
+    }
+
+    /// Deletes a change.
+    ///
+    /// New or abandoned changes can be deleted by their owner if the user is granted the
+    /// `Delete Own Changes` permission, otherwise only by administrators.
+    pub fn delete_change(&mut self, change_id: &str) -> Result<()> {
+        self.rest.delete(
+            format!("/a/changes/{}", change_id).as_str(),
+            StatusCode::NO_CONTENT,
+        )
     }
 
     /// Retrieves the topic of a change.
@@ -319,5 +331,21 @@ impl GerritRestApi {
         )?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
+    }
+
+    /// Lists the published comments of all revisions of the change.
+    ///
+    /// Returns a map of file paths to lists of CommentInfo entries. The entries in the map are
+    /// sorted by file path, and the comments for each path are sorted by patch set number.
+    /// Each comment has the patch_set and author fields set.
+    pub fn list_change_comments(
+        &mut self, change_id: &str,
+    ) -> Result<BTreeMap<String, CommentInfo>> {
+        let json = self.rest.get_json(
+            format!("/a/changes/{}/comments", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let comments: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
+        Ok(comments)
     }
 }
