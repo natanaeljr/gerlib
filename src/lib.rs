@@ -5,14 +5,15 @@ extern crate strum;
 extern crate strum_macros;
 
 use crate::changes::{
-    AbandonInput, AdditionalOpt, ChangeInfo, ChangeInput, CommentInfo, MoveInput, QueryParams,
-    RebaseInput, RestoreInput, RevertInput, SubmitInput, TopicInput,
+    AbandonInput, AdditionalOpt, AssigneeInput, ChangeInfo, ChangeInput, CommentInfo, MoveInput,
+    QueryParams, RebaseInput, RestoreInput, RevertInput, SubmitInput, TopicInput,
 };
 use crate::handler::RestHandler;
 use crate::http::HttpRequestHandler;
 use ::http::StatusCode;
 use url::Url;
 
+use crate::accounts::AccountInfo;
 pub use crate::http::AuthMethod as HttpAuthMethod;
 use std::collections::BTreeMap;
 
@@ -208,6 +209,63 @@ impl GerritRestApi {
         )
     }
 
+    /// Retrieves the account of the user assigned to a change.
+    ///
+    /// As a response an AccountInfo entity describing the assigned account is returned.
+    pub fn get_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
+        let json = &self.rest.get_json(
+            format!("/a/changes/{}/assignee", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let assignee: AccountInfo = serde_json::from_str(&json)?;
+        Ok(assignee)
+    }
+
+    /// Returns a list of every user ever assigned to a change, in the order in which they were first assigned.
+    ///
+    /// [NOTE] Past assignees are only available when NoteDb is enabled.
+    ///
+    /// As a response a list of AccountInfo entities is returned.
+    pub fn get_past_assignees(&mut self, change_id: &str) -> Result<Vec<AccountInfo>> {
+        let json = &self.rest.get_json(
+            format!("/a/changes/{}/past_assignees", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let past_assignees: Vec<AccountInfo> = serde_json::from_str(&json)?;
+        Ok(past_assignees)
+    }
+
+    /// Sets the assignee of a change.
+    ///
+    /// The new assignee must be provided in the request body inside a AssigneeInput entity.
+    ///
+    /// As a response an AccountInfo entity describing the assigned account is returned.
+    pub fn set_assignee(
+        &mut self, change_id: &str, assignee: &AssigneeInput,
+    ) -> Result<AccountInfo> {
+        let json = &self.rest.put_json(
+            format!("/a/changes/{}/assignee", change_id).as_str(),
+            assignee,
+            StatusCode::OK,
+        )?;
+        let assignee: AccountInfo = serde_json::from_str(&json)?;
+        Ok(assignee)
+    }
+
+    /// Deletes the assignee of a change.
+    ///
+    /// As a response an AccountInfo entity describing the account of the deleted assignee is returned.
+    ///
+    /// If the change had no assignee the response is “204 No Content”.
+    pub fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
+        let json = &self.rest.delete_json(
+            format!("/a/changes/{}/assignee", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let assignee: AccountInfo = serde_json::from_str(&json)?;
+        Ok(assignee)
+    }
+
     /// Abandons a change.
     ///
     /// The request body does not need to include a AbandonInput entity if no review comment is added.
@@ -347,5 +405,19 @@ impl GerritRestApi {
         )?;
         let comments: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
         Ok(comments)
+    }
+
+    /// Lists the draft comments of all revisions of the change that belong to the calling user.
+    ///
+    /// Returns a map of file paths to lists of CommentInfo entries.
+    /// The entries in the map are sorted by file path, and the comments for each path are sorted by
+    /// patch set number. Each comment has the `patch_set` field set, and no `author`.
+    pub fn list_change_drafts(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
+        let json = self.rest.get_json(
+            format!("/a/changes/{}/drafts", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let drafts: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
+        Ok(drafts)
     }
 }
