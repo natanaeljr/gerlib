@@ -4,10 +4,7 @@ extern crate strum;
 #[macro_use]
 extern crate strum_macros;
 
-use crate::changes::{
-    AbandonInput, AdditionalOpt, AssigneeInput, ChangeInfo, ChangeInput, CommentInfo, MoveInput,
-    QueryParams, RebaseInput, RestoreInput, RevertInput, SubmitInput, TopicInput,
-};
+use crate::changes::*;
 use crate::handler::RestHandler;
 use crate::http::HttpRequestHandler;
 use ::http::StatusCode;
@@ -419,5 +416,51 @@ impl GerritRestApi {
         )?;
         let drafts: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
         Ok(drafts)
+    }
+
+    /// Lists all the messages of a change including detailed account information.
+    ///
+    /// As response a list of ChangeMessageInfo entities is returned.
+    pub fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {
+        let json = self.rest.get_json(
+            format!("/a/changes/{}/messages", change_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let messages: Vec<ChangeMessageInfo> = serde_json::from_str(&json)?;
+        Ok(messages)
+    }
+
+    /// Retrieves a change message including detailed account information.
+    ///
+    /// As response a ChangeMessageInfo entity is returned.
+    pub fn get_change_message(
+        &mut self, change_id: &str, message_id: &str,
+    ) -> Result<ChangeMessageInfo> {
+        let json = self.rest.get_json(
+            format!("/a/changes/{}/messages/{}", change_id, message_id).as_str(),
+            StatusCode::OK,
+        )?;
+        let message: ChangeMessageInfo = serde_json::from_str(&json)?;
+        Ok(message)
+    }
+
+    /// Deletes a change message by replacing the change message with a new message, which contains
+    /// the name of the user who deleted the change message and the reason why it was deleted.
+    /// The reason can be provided in the request body as a DeleteChangeMessageInput entity.
+    ///
+    /// Note that only users with the Administrate Server global capability are permitted to delete
+    /// a change message.
+    ///
+    /// As response a ChangeMessageInfo entity is returned that describes the updated change message.
+    pub fn delete_change_message(
+        &mut self, change_id: &str, message_id: &str, input: &DeleteChangeMessageInput,
+    ) -> Result<ChangeMessageInfo> {
+        let json = self.rest.post_json(
+            format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
+            input,
+            StatusCode::OK,
+        )?;
+        let message: ChangeMessageInfo = serde_json::from_str(&json)?;
+        Ok(message)
     }
 }
