@@ -64,7 +64,8 @@ impl GerritRestApi {
     pub fn create_change(&mut self, change: &ChangeInput) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json("/a/changes/", change, StatusCode::CREATED)?;
+            .post_json("/a/changes/", change, StatusCode::CREATED)?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -90,7 +91,7 @@ impl GerritRestApi {
             if params.is_empty() { "" } else { "?" },
             params
         );
-        let json = self.rest.get_json(&url, StatusCode::OK)?;
+        let json = self.rest.get(&url, StatusCode::OK)?.json()?;
         let changes =
             if query.search_queries.is_some() && query.search_queries.as_ref().unwrap().len() > 1 {
                 serde_json::from_str::<Vec<Vec<ChangeInfo>>>(&json)?
@@ -123,7 +124,7 @@ impl GerritRestApi {
             if params.is_empty() { "" } else { "?" },
             params
         );
-        let json = self.rest.get_json(&url, StatusCode::OK)?;
+        let json = self.rest.get(&url, StatusCode::OK)?.json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -154,7 +155,7 @@ impl GerritRestApi {
             if params.is_empty() { "" } else { "?" },
             params
         );
-        let json = self.rest.get_json(&url, StatusCode::OK)?;
+        let json = self.rest.get(&url, StatusCode::OK)?.json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -174,10 +175,13 @@ impl GerritRestApi {
     ///
     /// If the change does not have a topic an empty string is returned.
     pub fn get_topic(&mut self, change_id: &str) -> Result<String> {
-        let json = &self.rest.get_json(
-            format!("/a/changes/{}/topic", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .get(
+                format!("/a/changes/{}/topic", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let topic: String = serde_json::from_str(&json)?;
         Ok(topic)
     }
@@ -189,11 +193,14 @@ impl GerritRestApi {
     ///
     /// As response the new topic is returned.
     pub fn set_topic(&mut self, change_id: &str, topic: &TopicInput) -> Result<String> {
-        let json = &self.rest.put_json(
-            format!("/a/changes/{}/topic", change_id).as_str(),
-            topic,
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .put_json(
+                format!("/a/changes/{}/topic", change_id).as_str(),
+                topic,
+                StatusCode::OK,
+            )?
+            .json()?;
         let topic: String = serde_json::from_str(&json)?;
         Ok(topic)
     }
@@ -210,10 +217,13 @@ impl GerritRestApi {
     ///
     /// As a response an AccountInfo entity describing the assigned account is returned.
     pub fn get_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
-        let json = &self.rest.get_json(
-            format!("/a/changes/{}/assignee", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .get(
+                format!("/a/changes/{}/assignee", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let assignee: AccountInfo = serde_json::from_str(&json)?;
         Ok(assignee)
     }
@@ -224,10 +234,13 @@ impl GerritRestApi {
     ///
     /// As a response a list of AccountInfo entities is returned.
     pub fn get_past_assignees(&mut self, change_id: &str) -> Result<Vec<AccountInfo>> {
-        let json = &self.rest.get_json(
-            format!("/a/changes/{}/past_assignees", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .get(
+                format!("/a/changes/{}/past_assignees", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let past_assignees: Vec<AccountInfo> = serde_json::from_str(&json)?;
         Ok(past_assignees)
     }
@@ -240,11 +253,14 @@ impl GerritRestApi {
     pub fn set_assignee(
         &mut self, change_id: &str, assignee: &AssigneeInput,
     ) -> Result<AccountInfo> {
-        let json = &self.rest.put_json(
-            format!("/a/changes/{}/assignee", change_id).as_str(),
-            assignee,
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .put_json(
+                format!("/a/changes/{}/assignee", change_id).as_str(),
+                assignee,
+                StatusCode::OK,
+            )?
+            .json()?;
         let assignee: AccountInfo = serde_json::from_str(&json)?;
         Ok(assignee)
     }
@@ -255,10 +271,13 @@ impl GerritRestApi {
     ///
     /// If the change had no assignee the response is “204 No Content”.
     pub fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
-        let json = &self.rest.delete_json(
-            format!("/a/changes/{}/assignee", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = &self
+            .rest
+            .delete_json(
+                format!("/a/changes/{}/assignee", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let assignee: AccountInfo = serde_json::from_str(&json)?;
         Ok(assignee)
     }
@@ -277,11 +296,14 @@ impl GerritRestApi {
     pub fn abandon_change(
         &mut self, change_id: &str, abandon: &AbandonInput,
     ) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/abandon", change_id).as_str(),
-            abandon,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/abandon", change_id).as_str(),
+                abandon,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -297,11 +319,14 @@ impl GerritRestApi {
     pub fn restore_change(
         &mut self, change_id: &str, restore: &RestoreInput,
     ) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/restore", change_id).as_str(),
-            restore,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/restore", change_id).as_str(),
+                restore,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -316,11 +341,14 @@ impl GerritRestApi {
     /// If the change cannot be rebased, e.g. due to conflicts, the response is “409 Conflict” and
     /// the error message is contained in the response body.
     pub fn rebase_change(&mut self, change_id: &str, rebase: &RebaseInput) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/rebase", change_id).as_str(),
-            rebase,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/rebase", change_id).as_str(),
+                rebase,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -340,11 +368,14 @@ impl GerritRestApi {
     /// or upload permission on the destination, the response is “409 Conflict” and the error message
     /// is contained in the response body.
     pub fn move_change(&mut self, change_id: &str, move_input: &MoveInput) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/move", change_id).as_str(),
-            move_input,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/move", change_id).as_str(),
+                move_input,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -361,11 +392,14 @@ impl GerritRestApi {
     /// If the change cannot be reverted because the change state doesn’t allow reverting the change,
     /// the response is “409 Conflict” and the error message is contained in the response body.
     pub fn revert_change(&mut self, change_id: &str, revert: &RevertInput) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/revert", change_id).as_str(),
-            revert,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/revert", change_id).as_str(),
+                revert,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -379,11 +413,14 @@ impl GerritRestApi {
     /// If the change cannot be submitted because the submit rule doesn’t allow submitting the change,
     /// the response is “409 Conflict” and the error message is contained in the response body.
     pub fn submit_change(&mut self, change_id: &str, submit: &SubmitInput) -> Result<ChangeInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/submit", change_id).as_str(),
-            submit,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/submit", change_id).as_str(),
+                submit,
+                StatusCode::OK,
+            )?
+            .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
     }
@@ -396,10 +433,13 @@ impl GerritRestApi {
     pub fn list_change_comments(
         &mut self, change_id: &str,
     ) -> Result<BTreeMap<String, CommentInfo>> {
-        let json = self.rest.get_json(
-            format!("/a/changes/{}/comments", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/comments", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let comments: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
         Ok(comments)
     }
@@ -410,10 +450,13 @@ impl GerritRestApi {
     /// The entries in the map are sorted by file path, and the comments for each path are sorted by
     /// patch set number. Each comment has the `patch_set` field set, and no `author`.
     pub fn list_change_drafts(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
-        let json = self.rest.get_json(
-            format!("/a/changes/{}/drafts", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/drafts", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let drafts: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
         Ok(drafts)
     }
@@ -422,10 +465,13 @@ impl GerritRestApi {
     ///
     /// As response a list of ChangeMessageInfo entities is returned.
     pub fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {
-        let json = self.rest.get_json(
-            format!("/a/changes/{}/messages", change_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/messages", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let messages: Vec<ChangeMessageInfo> = serde_json::from_str(&json)?;
         Ok(messages)
     }
@@ -436,10 +482,13 @@ impl GerritRestApi {
     pub fn get_change_message(
         &mut self, change_id: &str, message_id: &str,
     ) -> Result<ChangeMessageInfo> {
-        let json = self.rest.get_json(
-            format!("/a/changes/{}/messages/{}", change_id, message_id).as_str(),
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/messages/{}", change_id, message_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
         let message: ChangeMessageInfo = serde_json::from_str(&json)?;
         Ok(message)
     }
@@ -455,12 +504,95 @@ impl GerritRestApi {
     pub fn delete_change_message(
         &mut self, change_id: &str, message_id: &str, input: &DeleteChangeMessageInput,
     ) -> Result<ChangeMessageInfo> {
-        let json = self.rest.post_json(
-            format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
-            input,
-            StatusCode::OK,
-        )?;
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
+                input,
+                StatusCode::OK,
+            )?
+            .json()?;
         let message: ChangeMessageInfo = serde_json::from_str(&json)?;
         Ok(message)
+    }
+
+    /// Lists the reviewers of a change.
+    ///
+    /// As result a list of ReviewerInfo entries is returned.
+    pub fn list_reviewers(&mut self, change_id: &str) -> Result<Vec<ReviewerInfo>> {
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/reviewers/", change_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
+        let reviewers: Vec<ReviewerInfo> = serde_json::from_str(&json)?;
+        Ok(reviewers)
+    }
+
+    /// Retrieves a reviewer of a change.
+    ///
+    /// As response a ReviewerInfo entity is returned that describes the reviewer.
+    pub fn get_reviewer(&mut self, change_id: &str, account_id: &str) -> Result<ReviewerInfo> {
+        let json = self
+            .rest
+            .get(
+                format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str(),
+                StatusCode::OK,
+            )?
+            .json()?;
+        let reviewer: ReviewerInfo = serde_json::from_str(&json)?;
+        Ok(reviewer)
+    }
+
+    /// Adds one user or all members of one group as reviewer to the change.
+    ///
+    /// The reviewer to be added to the change must be provided in the request body as a ReviewerInput entity.
+    ///
+    /// Users can be moved from reviewer to CC and vice versa. This means if a user is added as CC that is
+    /// already a reviewer on the change, the reviewer state of that user is updated to CC.
+    /// If a user that is already a CC on the change is added as reviewer, the reviewer state of that user
+    /// is updated to reviewer.
+    pub fn add_reviewer(
+        &mut self, change_id: &str, reviewer: &ReviewerInput,
+    ) -> Result<AddReviewerResult> {
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/reviewers/", change_id).as_str(),
+                reviewer,
+                StatusCode::OK,
+            )?
+            .json()?;
+        let result: AddReviewerResult = serde_json::from_str(&json)?;
+        Ok(result)
+    }
+
+    /// Adds one user or all members of one group as reviewer to the change.
+    ///
+    /// The reviewer to be added to the change must be provided in the request body as a ReviewerInput entity.
+    ///
+    /// Users can be moved from reviewer to CC and vice versa. This means if a user is added as CC that is
+    /// already a reviewer on the change, the reviewer state of that user is updated to CC.
+    /// If a user that is already a CC on the change is added as reviewer, the reviewer state of that user
+    /// is updated to reviewer.
+    pub fn delete_reviewer(
+        &mut self, change_id: &str, account_id: &str, input: Option<&DeleteReviewerInput>,
+    ) -> Result<()> {
+        if let Some(input) = input {
+            self.rest.post_json(
+                format!("/a/changes/{}/reviewers/{}/delete", change_id, account_id).as_str(),
+                input,
+                StatusCode::NO_CONTENT,
+            )?;
+            ()
+        } else {
+            self.rest.delete(
+                format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str(),
+                StatusCode::NO_CONTENT,
+            )?
+        };
+        Ok(())
     }
 }
