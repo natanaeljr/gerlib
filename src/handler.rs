@@ -45,16 +45,11 @@ impl RestHandler {
         Ok(response.into())
     }
 
-    pub fn delete_json(&mut self, url: &str, expect_code: StatusCode) -> Result<Response> {
+    pub fn delete(&mut self, url: &str, expect_code: StatusCode) -> Result<Response> {
         self.http.headers(&[Header::AcceptAppJson])?;
         let (code, response) = self.http.delete(url)?;
         Self::expect_response_code(expect_code.as_u16() as u32, code)?;
         Ok(response.into())
-    }
-
-    pub fn delete(&mut self, url: &str, expect_code: StatusCode) -> Result<()> {
-        let (code, _) = self.http.delete(&url)?;
-        Self::expect_response_code(expect_code.as_u16() as u32, code)
     }
 
     fn expect_response_code(expected: u32, actual: u32) -> Result<()> {

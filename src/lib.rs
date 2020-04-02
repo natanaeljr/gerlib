@@ -168,7 +168,8 @@ impl GerritRestApi {
         self.rest.delete(
             format!("/a/changes/{}", change_id).as_str(),
             StatusCode::NO_CONTENT,
-        )
+        )?;
+        Ok(())
     }
 
     /// Retrieves the topic of a change.
@@ -210,7 +211,8 @@ impl GerritRestApi {
         self.rest.delete(
             format!("/a/changes/{}/topic", change_id).as_str(),
             StatusCode::NO_CONTENT,
-        )
+        )?;
+        Ok(())
     }
 
     /// Retrieves the account of the user assigned to a change.
@@ -273,7 +275,7 @@ impl GerritRestApi {
     pub fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
         let json = &self
             .rest
-            .delete_json(
+            .delete(
                 format!("/a/changes/{}/assignee", change_id).as_str(),
                 StatusCode::OK,
             )?
@@ -502,16 +504,24 @@ impl GerritRestApi {
     ///
     /// As response a ChangeMessageInfo entity is returned that describes the updated change message.
     pub fn delete_change_message(
-        &mut self, change_id: &str, message_id: &str, input: &DeleteChangeMessageInput,
+        &mut self, change_id: &str, message_id: &str, input: Option<&DeleteChangeMessageInput>,
     ) -> Result<ChangeMessageInfo> {
-        let json = self
-            .rest
-            .post_json(
-                format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
-                input,
-                StatusCode::OK,
-            )?
-            .json()?;
+        let json = if let Some(input) = input {
+            self.rest
+                .post_json(
+                    format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
+                    input,
+                    StatusCode::OK,
+                )?
+                .json()?
+        } else {
+            self.rest
+                .delete(
+                    format!("/a/changes/{}/messages/{}", change_id, message_id).as_str(),
+                    StatusCode::OK,
+                )?
+                .json()?
+        };
         let message: ChangeMessageInfo = serde_json::from_str(&json)?;
         Ok(message)
     }
@@ -585,8 +595,7 @@ impl GerritRestApi {
                 format!("/a/changes/{}/reviewers/{}/delete", change_id, account_id).as_str(),
                 input,
                 StatusCode::NO_CONTENT,
-            )?;
-            ()
+            )?
         } else {
             self.rest.delete(
                 format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str(),
