@@ -4,7 +4,7 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub enum Error {
     /// Unexpected HTTP response status code
-    UnexpectedHttpResponse(u32),
+    UnexpectedHttpResponse(::http::StatusCode, String),
     /// Response is not JSON
     NotJsonResponse(String),
     /// Failed to deserialize JSON response
@@ -18,7 +18,7 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Error::UnexpectedHttpResponse(code) => {
+            Error::UnexpectedHttpResponse(code, _) => {
                 write!(f, "Unexpected HTTP response code: {}", code)
             }
             Error::NotJsonResponse(_) => f.write_str("Unexpected non-JSON response"),
@@ -32,7 +32,7 @@ impl Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
-            Error::UnexpectedHttpResponse(_) => None,
+            Error::UnexpectedHttpResponse(..) => None,
             Error::NotJsonResponse(_) => None,
             Error::InvalidJsonResponse(ref e) => Some(e),
             Error::HttpHandler(ref e) => Some(e),

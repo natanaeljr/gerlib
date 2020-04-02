@@ -14,50 +14,50 @@ impl RestHandler {
         Self { http }
     }
 
-    pub fn get(&mut self, url: &str, expect_code: StatusCode) -> Result<Response> {
+    pub fn get(&mut self, url: &str) -> Result<Response> {
         self.http.headers(&[Header::AcceptAppJson])?;
-        let (code, response) = self.http.get(url)?;
-        Self::expect_response_code(expect_code.as_u16() as u32, code)?;
-        Ok(response.into())
+        let (code, message) = self.http.get(url)?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
     }
 
-    pub fn put_json<T>(&mut self, url: &str, data: &T, expect_code: StatusCode) -> Result<Response>
+    pub fn put_json<T>(&mut self, url: &str, data: &T) -> Result<Response>
     where
         T: Serialize + ?Sized,
     {
         self.http
             .headers(&[Header::ContentTypeAppJson, Header::AcceptAppJson])?;
         let data = serde_json::to_string(data)?;
-        let (code, response) = self.http.put(url, Some(data.as_bytes()))?;
-        Self::expect_response_code(expect_code.as_u16() as u32, code)?;
-        Ok(response.into())
+        let (code, message) = self.http.put(url, Some(data.as_bytes()))?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
     }
 
-    pub fn post_json<T>(&mut self, url: &str, data: &T, expect_code: StatusCode) -> Result<Response>
+    pub fn post_json<T>(&mut self, url: &str, data: &T) -> Result<Response>
     where
         T: Serialize + ?Sized,
     {
         self.http
             .headers(&[Header::ContentTypeAppJson, Header::AcceptAppJson])?;
         let data = serde_json::to_string(data)?;
-        let (code, response) = self.http.post(url, Some(data.as_bytes()))?;
-        Self::expect_response_code(expect_code.as_u16() as u32, code)?;
-        Ok(response.into())
+        let (code, message) = self.http.post(url, Some(data.as_bytes()))?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
     }
 
-    pub fn delete(&mut self, url: &str, expect_code: StatusCode) -> Result<Response> {
+    pub fn delete(&mut self, url: &str) -> Result<Response> {
         self.http.headers(&[Header::AcceptAppJson])?;
-        let (code, response) = self.http.delete(url)?;
-        Self::expect_response_code(expect_code.as_u16() as u32, code)?;
-        Ok(response.into())
-    }
-
-    fn expect_response_code(expected: u32, actual: u32) -> Result<()> {
-        if expected != actual {
-            Err(Error::UnexpectedHttpResponse(actual))
-        } else {
-            Ok(())
-        }
+        let (code, message) = self.http.delete(url)?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
     }
 
     pub fn http(self) -> HttpRequestHandler {
@@ -66,26 +66,42 @@ impl RestHandler {
 }
 
 pub struct Response {
-    response: String,
+    pub code: http::StatusCode,
+    pub message: Message,
 }
 
 impl Response {
+    pub fn expect(self, expected_code: http::StatusCode) -> Result<Message> {
+        if self.code.as_u16() != expected_code.as_u16() {
+            Err(Error::UnexpectedHttpResponse(
+                self.code,
+                self.message.string(),
+            ))
+        } else {
+            Ok(self.message)
+        }
+    }
+}
+
+pub struct Message(String);
+
+impl Message {
     pub fn string(self) -> String {
-        self.response
+        self.0
     }
 
     pub fn json(self) -> Result<String> {
         const MAGIC_PREFIX: &'static str = ")]}'\n";
-        if !self.response.starts_with(MAGIC_PREFIX) {
-            return Err(Error::NotJsonResponse(self.response));
+        if !self.0.starts_with(MAGIC_PREFIX) {
+            return Err(Error::NotJsonResponse(self.0));
         }
-        let json = self.response[MAGIC_PREFIX.len()..].to_string();
+        let json = self.0[MAGIC_PREFIX.len()..].to_string();
         Ok(json)
     }
 }
 
-impl From<String> for Response {
+impl From<String> for Message {
     fn from(s: String) -> Self {
-        Self { response: s }
+        Self(s)
     }
 }
