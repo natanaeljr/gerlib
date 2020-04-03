@@ -1,10 +1,12 @@
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// JSON Entities
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// The AccountInfo entity contains information about an account.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountInfo {
     /// The numeric ID of the account.
@@ -41,32 +43,27 @@ pub struct AccountInfo {
 }
 
 /// The AccountInput entity contains information for the creation of a new account.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountInput {
     /// The user name. If provided, must match the user name from the URL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub username: Option<String>,
     /// The full name of the user.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// The display name of the user.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<String>,
     /// The email address of the user.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
     /// The public SSH key of the user.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub ssh_key: Option<String>,
     /// The HTTP password of the user.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub http_password: Option<String>,
     /// A list of group IDs that identify the groups to which the user should be added.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub groups: Option<Vec<u32>>,
 }
 
 /// The AccountInfo entity contains information about an avatar image of an account.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AvatarInfo {
     /// The URL to the avatar image.
@@ -78,6 +75,7 @@ pub struct AvatarInfo {
 }
 
 /// The GpgKeyInfo entity contains information about a GPG public key.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GpgKeyInfo {
     /// The 8-char hex GPG key ID.
@@ -102,7 +100,7 @@ pub struct GpgKeyInfo {
 }
 
 /// Key check status.
-#[derive(Debug, Display, Serialize, Deserialize)]
+#[derive(Debug, Display, PartialEq, Eq, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum KeyStatus {

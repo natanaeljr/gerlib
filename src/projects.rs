@@ -1,16 +1,19 @@
 use crate::changes::WebLinkInfo;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Display, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ProjectStatus {
     Active,
     ReadOnly,
     Hidden,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize)]
 /// The ProjectInfo entity contains information about a project.
 pub struct ProjectInfo {
     /// The URL encoded project name.
@@ -33,5 +36,5 @@ pub struct ProjectInfo {
     pub web_links: Option<Vec<WebLinkInfo>>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LabelTypeInfo {}

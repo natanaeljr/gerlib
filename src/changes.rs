@@ -7,6 +7,7 @@ use crate::details::Timestamp;
 use crate::Result;
 use serde::{Serialize, Serializer};
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::{Display, Error, Formatter};
 
@@ -265,24 +266,23 @@ pub trait ChangeEndpoint {
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// The AbandonInput entity contains information for abandoning a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AbandonInput {
     /// Message to be added as review comment to the change when abandoning the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     /// Notify handling that defines to whom email notifications should be sent
     /// after the change is abandoned.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
 /// The ActionInfo entity describes a REST API call the client can make to manipulate a resource.
 /// These are frequently implemented by plugins and may be discovered at runtime.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ActionInfo {
     /// HTTP method to use with the action.
@@ -301,6 +301,7 @@ pub struct ActionInfo {
 }
 
 /// The AddReviewerResult entity describes the result of adding a reviewer to a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AddReviewerResult {
     /// Value of the reviewer field from ReviewerInput set while adding the reviewer.
@@ -321,6 +322,7 @@ pub struct AddReviewerResult {
 
 /// The ApprovalInfo entity contains information about an approval from a user for a label on a change.
 /// ApprovalInfo has the same fields as AccountInfo. In addition to the following fields:
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApprovalInfo {
     /// The account information entity.
@@ -367,16 +369,14 @@ pub struct BlameInfo {
 }
 
 /// The ChangeEditInput entity contains information for restoring a path within change edit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChangeEditInput {
     /// Path to file to restore.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub restore_path: Option<String>,
     /// Old path to file to rename.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub old_path: Option<String>,
     /// New path to file to rename.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_path: Option<String>,
 }
 
@@ -389,6 +389,7 @@ pub struct ChangeEditMessageInput {
 }
 
 /// The ChangeInfo entity contains information about a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChangeInfo {
     /// The ID of the change in the format "'<project>~<branch>~<Change-Id>'",
@@ -511,6 +512,7 @@ pub struct ChangeInfo {
 }
 
 /// The ChangeInput entity contains information about creating a new change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChangeInput {
     /// The name of the project.
@@ -521,49 +523,38 @@ pub struct ChangeInput {
     /// The commit message of the change. Comment lines (beginning with #) will be removed.
     pub subject: String,
     /// The topic to which this change belongs.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub topic: Option<String>,
     /// The status of the change (only NEW accepted here).
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<ChangeStatus>,
     /// Whether the new change should be marked as private.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_private: Option<bool>,
     /// Whether the new change should be set to work in progress.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub work_in_progress: Option<bool>,
     /// A {change-id} that identifies the base change for a create change operation.
     /// Mutually exclusive with base_commit.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub base_change: Option<String>,
     /// A 40-digit hex SHA-1 of the commit which will be the parent commit of the newly
     /// created change. If set, it must be a merged commit on the destination branch.
     /// Mutually exclusive with base_change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub base_commit: Option<String>,
     /// Allow creating a new branch when set to true.
     /// Using this option is only possible for non-merge commits (if the merge field is not set).
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_branch: Option<bool>,
     /// The detail of a merge commit as a MergeInput entity.
     /// If set, the target branch (see branch field) must exist (it is not possible to create it
     /// automatically by setting the new_branch field to true.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub merge: Option<MergeInput>,
     /// An AccountInput entity that will set the author of the commit to create.
     /// The author must be specified as name/email combination.
     /// The caller needs "Forge Author" permission when using this field.
     /// This field does not affect the owner of the change, which will continue to use the identity
     /// of the caller.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AccountInput>,
     /// Notify handling that defines to whom email notifications should be sent after the change is
     /// created. If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
@@ -579,6 +570,7 @@ pub enum ChangeKind {
 }
 
 /// The ChangeMessageInfo entity contains information about a message attached to a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChangeMessageInfo {
     /// The ID of the message.
@@ -626,42 +618,37 @@ pub enum ChangeType {
 }
 
 /// The CherryPickInput entity contains information for cherry-picking a change to a new branch.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CherryPickInput {
     /// Commit message for the cherry-pick change. If not set, the commit message of the
     /// cherry-picked commit is used.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     /// Destination branch.
     pub destination: String,
     /// 40-hex digit SHA-1 of the commit which will be the parent commit of the newly created change.
     /// If set, it must be a merged commit or a change revision on the destination branch.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub base: Option<String>,
     /// Number of the parent relative to which the cherry-pick should be considered.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<u32>,
     /// Notify handling that defines to whom email notifications should be sent after the change is
     /// created. If not set, the default is NONE.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
     /// If true, carries reviewers and ccs over from original change to newly created one.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub keep_reviewers: Option<bool>,
     /// If true, the cherry-pick uses content merge and succeeds also if there are conflicts.
     /// If there are conflicts the file contents of the created change contain git conflict markers
     /// to indicate the conflicts. Callers can find out if there were conflicts by checking the
     /// contains_git_conflicts field in the ChangeInfo. If there are conflicts the cherry-pick
     /// change is marked as work-in-progress.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_conflicts: Option<bool>,
 }
 
 /// The CommentInfo entity contains information about an inline comment.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommentInfo {
     /// The patch set number for the comment; only set in contexts where
@@ -702,47 +689,39 @@ pub struct CommentInfo {
 }
 
 /// The CommentInput entity contains information for creating an inline comment.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommentInput {
     /// The URL encoded UUID of the comment if an existing draft comment should be updated.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     /// The path of the file for which the inline comment should be added.
     /// Doesn’t need to be set if contained in a map where the key is the file path.    
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<String>,
     /// The side on which the comment was added.
     /// Allowed values are REVISION and PARENT. If not set, the default is REVISION.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub side: Option<CommentSide>,
     /// The number of the line for which the comment should be added.
     /// 0 if it is a file comment.
     /// If neither line nor range is set, a file comment is added.
     /// If range is set, this value is ignored in favor of the end_line of the range.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub line: Option<u32>,
     /// The range of the comment as a CommentRange entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub range: Option<CommentRange>,
     /// The URL encoded UUID of the comment to which this comment is a reply.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub in_reply_to: Option<String>,
     /// The timestamp of when this comment was written.
     /// Accepted but ignored.
     pub updated: Timestamp,
     /// The comment message.
     /// If not set and an existing draft comment is updated, the existing draft comment is deleted.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     /// Value of the tag field. Only allowed on draft comment inputs;
     /// for published comments, use the tag field in ReviewInput.
     /// Votes/comments that contain tag with 'autogenerated:' prefix can be filtered out in the web UI.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
     /// Whether or not the comment must be addressed by the user.
     /// This value will default to false if the comment is an orphan, or the value of the
     /// in_reply_to comment if it is supplied.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub unresolved: Option<bool>,
 }
 
@@ -766,6 +745,7 @@ pub struct CommentRange {
 }
 
 /// The CommitInfo entity contains information about a commit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommitInfo {
     /// The commit ID. Not set if included in a RevisionInfo entity that is contained in a map
@@ -787,17 +767,16 @@ pub struct CommitInfo {
 }
 
 /// The CommitMessageInput entity contains information for changing the commit message of a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommitMessageInput {
     pub message: String,
     /// Notify handling that defines to whom email notifications should be sent after
     /// the commit message was updated.
     /// If not set, the default is OWNER for WIP changes and ALL otherwise.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
@@ -811,54 +790,51 @@ pub enum CommentSide {
 }
 
 /// The DeleteChangeMessageInput entity contains the options for deleting a change message.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeleteChangeMessageInput {
     /// The reason why the change message should be deleted.
     /// If set, the change message will be replaced with:
     /// "Change message removed by: name\nReason: reason`", or just "Change message removed by: `name." if not set.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
 
 /// The DeleteCommentInput entity contains the option for deleting a comment.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeleteCommentInput {
     /// The reason why the comment should be deleted.
     /// If set, the comment’s message will be replaced with:
     /// "Comment removed by: name; Reason: reason`", or just "Comment removed by: `name." if not set.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
 
 /// The DeleteReviewerInput entity contains options for the deletion of a reviewer.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeleteReviewerInput {
     /// Notify handling that defines to whom email notifications should be sent
     /// after the reviewer is deleted.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
 /// The DeleteVoteInput entity contains options for the deletion of a vote.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeleteVoteInput {
     /// The label for which the vote should be deleted.
     /// If set, must match the label in the URL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     /// Notify handling that defines to whom email notifications should be sent after
     /// the vote is deleted.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
@@ -870,6 +846,7 @@ pub struct DescriptionInput {
 }
 
 /// The DiffContent entity contains information about the content differences in a file.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DiffContent {
     /// Content only in the file on side A (deleted in B).
@@ -897,6 +874,7 @@ pub struct DiffContent {
 }
 
 /// The DiffFileMetaInfo entity contains meta information about a file diff.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DiffFileMetaInfo {
     /// The name of the file.
@@ -911,6 +889,7 @@ pub struct DiffFileMetaInfo {
 
 /// The DiffInfo entity contains information about the diff of a file in a revision.
 /// If the weblinks-only parameter is specified, only the web_links field is set.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DiffInfo {
     /// Meta information about the file on side A as a DiffFileMetaInfo entity.
@@ -977,6 +956,7 @@ pub enum DraftHandling {
 }
 
 /// The EditFileInfo entity contains additional information of a file within a change edit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EditFileInfo {
     /// Links to the diff info in external sites as a list of WebLinkInfo entities.
@@ -984,6 +964,7 @@ pub struct EditFileInfo {
 }
 
 /// The EditInfo entity contains information about a change edit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EditInfo {
     /// The commit of change edit as CommitInfo entity.
@@ -1004,6 +985,7 @@ pub struct EditInfo {
 }
 
 /// The FetchInfo entity contains information about how to fetch a patch set via a certain protocol.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FetchInfo {
     pub url: String,
@@ -1016,6 +998,7 @@ pub struct FetchInfo {
 }
 
 /// The FileInfo entity contains information about a file in a patch set.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileInfo {
     /// The status of the file
@@ -1068,17 +1051,18 @@ impl Default for FileStatus {
 }
 
 /// The FixInput entity contains options for fixing commits using the fix change endpoint.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FixInput {
     /// If true, delete patch sets from the database if they refer to missing commit options.
     pub delete_patch_set_if_commit_missing: bool,
     /// If set, check that the change is merged into the destination branch as this exact SHA-1.
     /// If not, insert a new patch set referring to this commit.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub expect_merged_as: Option<String>,
 }
 
 /// The FixSuggestionInfo entity represents a suggested fix.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FixSuggestionInfo {
     /// The UUID of the suggested fix.
@@ -1128,13 +1112,12 @@ pub struct GroupBaseInfo {
 }
 
 /// The HashtagsInput entity contains information about hashtags to add to, and/or remove from, a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HashtagsInput {
     /// The list of hashtags to be added to the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub add: Option<Vec<String>>,
     /// The list of hashtags to be removed from the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub remove: Option<Vec<String>>,
 }
 
@@ -1149,6 +1132,7 @@ pub enum HttpMethod {
 }
 
 /// The IncludedInInfo entity contains information about the branches a change was merged into and tags it was tagged with.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IncludedInInfo {
     /// The list of branches this change was merged into. Each branch is listed without the 'refs/head/' prefix.
@@ -1176,6 +1160,7 @@ pub enum IntralineStatus {
 ///  - For a quick summary of the state of labels, use LABELS.
 ///  - For detailed information about labels, including exact numeric votes for all users and the
 ///    allowed range of votes for the current user, use DETAILED_LABELS.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LabelInfo {
     /// Whether the label is optional. Optional means the label may be set,
@@ -1211,6 +1196,7 @@ pub struct LabelInfo {
 }
 
 /// The MergeableInfo entity contains information about the mergeability of a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MergeableInfo {
     /// Submit type used for this change.
@@ -1230,6 +1216,7 @@ pub struct MergeableInfo {
 }
 
 /// The MergeInput entity contains information about the merge.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MergeInput {
     /// The source to merge from, e.g. a complete or abbreviated commit SHA-1,a complete reference
@@ -1238,10 +1225,8 @@ pub struct MergeInput {
     /// A branch from which source is reachable. If specified, source is checked for visibility and
     /// reachability against only this branch. This speeds up the operation, especially for large
     /// repos with many branches.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub source_branch: Option<String>,
     /// The strategy of the merge.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub strategy: Option<MergeStrategy>,
     /// If true, creating the merge succeeds also if there are conflicts.
     /// If there are conflicts the file contents of the created change contain git conflict markers to indicate the conflicts.
@@ -1249,25 +1234,22 @@ pub struct MergeInput {
     /// If there are conflicts the change is marked as work-in-progress.
     /// This option is not supported for all merge strategies (e.g. it’s supported for recursive and resolve, but not for simple-two-way-in-core).
     /// Defaults to false.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_conflicts: Option<bool>,
 }
 
 /// The MergePatchSetInput entity contains information about updating a new change by creating
 /// a new merge commit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MergePatchSetInput {
     /// The new subject for the change, if not specified, will reuse the current patch set’s subject
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<String>,
     /// Use the current patch set’s first parent as the merge tip when set to true.
     /// Default to false.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub inherit_parent: Option<bool>,
     /// A {change-id} that identifies a change. When inherit_parent is false, the merge tip will be
     /// the current patch set of the base_change if it’s set. Otherwise, the current branch tip of
     /// the destination branch will be used.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub base_change: Option<String>,
     /// The detail of the source commit for merge as a MergeInput entity.
     pub merge: MergeInput,
@@ -1286,12 +1268,12 @@ pub enum MergeStrategy {
 }
 
 /// The MoveInput entity contains information for moving a change to a new branch.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MoveInput {
     /// Destination branch.
     pub destination_branch: String,
     /// A message to be posted in this change’s comments
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
 }
 
@@ -1310,6 +1292,7 @@ pub enum NotifyHandling {
 /// update. These notifications are sent out even if a notify option in the request input disables
 /// normal notifications. NotifyInfo entities are normally contained in a notify_details map in the
 /// request input where the key is the recipient type.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NotifyInfo {
     /// A list of account IDs that identify the accounts that should be should be notified.
@@ -1317,16 +1300,17 @@ pub struct NotifyInfo {
 }
 
 /// The PrivateInput entity contains information for changing the private flag on a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PrivateInput {
     /// Message describing why the private flag was changed.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
 }
 
 /// The ProblemInfo entity contains a description of a potential consistency problem with a change.
 /// These are not related to the code review process, but rather indicate some inconsistency in
 /// Gerrit’s database or repository metadata related to the enclosing change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProblemInfo {
     /// Plaintext message describing the problem with the change.
@@ -1347,16 +1331,15 @@ pub enum ProblemStatus {
 }
 
 /// The PublishChangeEditInput entity contains options for the publishing of change edit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublishChangeEditInput {
     /// Notify handling that defines to whom email notifications should be sent
     /// after the change edit is published.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
@@ -1389,13 +1372,13 @@ pub struct RangeInfo {
 }
 
 /// The RebaseInput entity contains information for changing parent when rebasing.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RebaseInput {
     /// The new parent revision. This can be a ref or a SHA1 to a concrete patchset.
     /// Alternatively, a change number can be specified, in which case the current patch set is inferred.
     /// Empty string is used for rebasing directly on top of the target branch, which effectively breaks
     /// dependency towards a parent change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub base: Option<String>,
 }
 
@@ -1410,6 +1393,7 @@ pub enum RecipientType {
 }
 
 /// The RelatedChangeAndCommitInfo entity contains information about a related change and commit.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RelatedChangeAndCommitInfo {
     /// The project of the change or commit.
@@ -1440,6 +1424,7 @@ pub struct RelatedChangesInfo {
 }
 
 /// The Requirement entity contains information about a requirement relative to a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Requirement {
     /// Status of the requirement.
@@ -1467,32 +1452,29 @@ pub enum RequirementStatus {
 }
 
 /// The RestoreInput entity contains information for restoring a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RestoreInput {
     /// Message to be added as review comment to the change when restoring the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
 }
 
 /// The RevertInput entity contains information for reverting a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RevertInput {
     /// Message to be added as review comment to the change when reverting the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     /// Notify handling that defines to whom email notifications should be sent
     /// for reverting the change.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
     /// Name of the topic for the revert change.
     /// If not set, the default for Revert endpoint is the topic of the change being reverted,
     /// and the default for the RevertSubmission endpoint is revert-{submission_id}-{timestamp.now}.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub topic: Option<String>,
 }
 
@@ -1538,24 +1520,20 @@ pub struct ReviewerUpdateInfo {
 }
 
 /// The ReviewInput entity contains information for adding a review to a revision.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReviewInput {
     /// The message to be added as review comment.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     /// Apply this tag to the review comment message, votes, and inline comments.
     /// Tags may be used by CI or other automated systems to distinguish them from human reviews.
     /// Votes/comments that contain tag with 'autogenerated:' prefix can be filtered out in the web UI.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
     /// The votes that should be added to the revision as a map that maps the label names to the voting values.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<BTreeMap<String, i32>>,
     /// The comments that should be added as a map that maps a file path to a list of CommentInput entities.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comments: Option<HashMap<String, Vec<CommentInput>>>,
     /// The robot comments that should be added as a map that maps a file path to a list of RobotCommentInput entities.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub robot_comments: Option<HashMap<String, Vec<RobotCommentInput>>>,
     /// Draft handling that defines how draft comments are handled that are already in the database
     /// but that were not also described in this input.
@@ -1563,33 +1541,25 @@ pub struct ReviewInput {
     /// All values except PUBLISH_ALL_REVISIONS operate only on drafts for a single revision.
     /// Only KEEP is allowed when used in conjunction with on_behalf_of.
     /// If not set, the default is KEEP. If on_behalf_of is set, then no other value besides KEEP is allowed.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub drafts: Option<DraftHandling>,
     /// Notify handling that defines to whom email notifications should be sent after the review is stored.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
     /// If true, comments with the same content at the same place will be omitted.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub omit_duplicate_comments: Option<bool>,
     /// {account-id} the review should be posted on behalf of.
     /// To use this option the caller must have been granted labelAs-NAME permission for all keys of labels.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_behalf_of: Option<String>,
     /// A list of ReviewerInput representing reviewers that should be added to the change.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reviewers: Option<Vec<ReviewerInput>>,
     /// If true, and if the change is work in progress, then start review.
     /// It is an error for both ready and work_in_progress to be true.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub ready: Option<bool>,
     /// If true, mark the change as work in progress.
     /// It is an error for both ready and work_in_progress to be true.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub work_in_progress: Option<bool>,
 }
 
@@ -1607,6 +1577,7 @@ pub struct ReviewerInfo {
 }
 
 /// The ReviewerInput entity contains information for adding a reviewer to a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReviewerInput {
     /// The ID of one account that should be added as reviewer or the ID of one internal group for
@@ -1616,25 +1587,22 @@ pub struct ReviewerInput {
     pub reviewer: String,
     /// Add reviewer in this state.
     /// If not given, defaults to REVIEWER.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<ReviewerState>,
     /// Whether adding the reviewer is confirmed.
     /// The Gerrit server may be configured to require a confirmation when adding a group as
     /// reviewer that has many members.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirmed: Option<bool>,
     /// Notify handling that defines to whom email notifications should be sent after
     /// the reviewer is added.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
 /// The ReviewerInput entity contains information for adding a reviewer to a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RevisionInfo {
     /// The change kind.
@@ -1680,6 +1648,7 @@ pub struct RevisionInfo {
 
 /// The RobotCommentInfo entity contains information about a robot inline comment.
 /// RobotCommentInfo has the same fields as CommentInfo. In addition RobotCommentInfo has the following fields:
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobotCommentInfo {
     /// The comment information entity.
@@ -1707,6 +1676,7 @@ pub struct RobotCommentInput {
 }
 
 /// The RuleInput entity contains information to test a Prolog rule.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RuleInput {
     /// Prolog code to execute instead of the code in refs/meta/config.
@@ -1715,7 +1685,6 @@ pub struct RuleInput {
     /// project specific rule. This behavior matches how the rule will execute if installed.
     /// If SKIP the parent filters are not called, allowing the test to return results from the input rule.
     /// RUN if not set.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub filters: Option<RuleFilter>,
 }
 
@@ -1729,6 +1698,7 @@ pub enum RuleFilter {
 }
 
 /// The SubmitInfo entity contains information about the change status after submitting.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubmitInfo {
     /// The status of the change after submitting is MERGED.
@@ -1743,26 +1713,25 @@ pub struct SubmitInfo {
 }
 
 /// The SubmitInput entity contains information for submitting a change.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubmitInput {
     /// If set, submit the change on behalf of the given user.
     /// The value may take any format accepted by the accounts REST API.
     /// Using this option requires Submit (On Behalf Of) permission on the branch.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_behalf_of: Option<String>,
     /// Notify handling that defines to whom email notifications should be sent after
     /// the change is submitted.
     /// If not set, the default is ALL.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify: Option<NotifyHandling>,
     /// Additional information about whom to notify about the update as a
     /// map of recipient type to NotifyInfo entity.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_details: Option<HashMap<RecipientType, NotifyInfo>>,
 }
 
 /// The SubmitRecord entity describes results from a submit_rule.
 /// Fields in this entity roughly correspond to the fields set by LABELS in LabelInfo.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubmitRecord {
     /// The submit status.
@@ -1838,6 +1807,7 @@ pub enum SubmitStatus {
 /// change (an account or a group).
 /// SuggestedReviewerInfo has either the account field that contains the AccountInfo entity,
 /// or the group field that contains the GroupBaseInfo entity.
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SuggestedReviewerInfo {
     /// An AccountInfo entity, if the suggestion is an account.
@@ -1879,7 +1849,8 @@ pub struct VotingRangeInfo {
 }
 
 /// The WebLinkInfo entity describes a link to an external site.
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct WebLinkInfo {
     /// The link name.
     pub name: String,
@@ -1890,10 +1861,10 @@ pub struct WebLinkInfo {
 }
 
 /// The WorkInProgressInput entity contains additional information for a change set to WorkInProgress/ReadyForReview.
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct WorkInProgressInput {
     /// Message to be added as a review comment to the change being set WorkInProgress/ReadyForReview.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
 }
 
