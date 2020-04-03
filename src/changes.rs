@@ -559,8 +559,9 @@ pub struct ChangeInput {
 }
 
 /// Change kind.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Display, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ChangeKind {
     Rework,
     TrivialRebase,
@@ -606,8 +607,9 @@ pub enum ChangeStatus {
 }
 
 /// The type of change.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Display, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ChangeType {
     Added,
     Modified,
