@@ -79,7 +79,7 @@ pub trait ChangeEndpoint {
 
     /// Creates a new patch set with a new commit message.
     ///
-    /// The new commit message must be provided in the request body inside a CommitMessageInput entity.
+    /// The new commit message must be provided in the request body inside a `CommitMessageInput` entity.
     /// If a Change-Id footer is specified, it must match the current Change-Id footer.
     /// If the Change-Id footer is absent, the current Change-Id is added to the message.
     fn set_commit_message(
@@ -140,7 +140,7 @@ pub trait ChangeEndpoint {
     /// to check against. It takes precedence over revertOf. If the change has no reference in revertOf,
     /// the parameter is mandatory.
     ///
-    /// As response a PureRevertInfo entity is returned.
+    /// As response a `PureRevertInfo` entity is returned.
     fn get_pure_revert(&mut self, change_id: &str, commit: Option<&str>) -> Result<PureRevertInfo>;
 
     /// Abandons a change.
@@ -205,6 +205,38 @@ pub trait ChangeEndpoint {
     /// If the change cannot be reverted because the change state doesn’t allow reverting the change,
     /// the response is “409 Conflict” and the error message is contained in the response body.
     fn revert_change(&mut self, change_id: &str, revert: &RevertInput) -> Result<ChangeInfo>;
+
+    /// Creates open revert changes for all of the changes of a certain submission.
+    ///
+    /// The subject of each revert change will be 'Revert "<subject-of-reverted-change"'.
+    /// If the subject is above 60 characters, the subject will be cut to 56 characters with "…​" in the end.
+    /// However, whenever reverting the submission of a revert submission, the subject will be shortened
+    /// from 'Revert "Revert "<subject-of-reverted-change""' to 'Revert^2 "<subject-of-reverted-change"'.
+    /// Also, for every future revert submission, the only difference in the subject will be the number of
+    /// the revert (instead of Revert^2 the subject will change to Revert^3 and so on).
+    /// There are no guarantees about the subjects if the users change the default subjects.
+    ///
+    /// Details for the revert can be specified in the request body inside a `RevertInput`.
+    /// The topic of all created revert changes will be revert-{submission_id}-{random_string_of_size_10}.
+    ///
+    /// The changes will not be rebased on onto the destination branch so the users may still have to
+    /// manually rebase them to resolve conflicts and make them submittable.
+    ///
+    /// However, the changes that have the same project and branch will be rebased on top of each other.
+    /// E.g, the first revert change will have the original change as a parent, and the second revert change
+    /// will have the first revert change as a parent.
+    ///
+    /// There is one special case that involves merge commits; if a user has multiple changes in the
+    /// same project and branch, but not in the same change series, those changes can still get submitted
+    /// together if they have the same topic and change.submitWholeTopic in gerrit.config is set to true.
+    /// In the case, Gerrit may create merge commits on submit (depending on the submit types of the project).
+    /// The first parent for the reverts will be the most recent merge commit that was created by Gerrit to
+    /// merge the different change series into the target branch.
+    ///
+    /// As response `RevertSubmissionInfo` entity is returned. That entity describes the revert changes.
+    fn revert_submission(
+        &mut self, change_id: &str, revert: &RevertInput,
+    ) -> Result<RevertSubmissionInfo>;
 
     /// Submits a change.
     ///

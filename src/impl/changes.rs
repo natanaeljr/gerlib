@@ -2,6 +2,7 @@
 
 use crate::accounts::AccountInfo;
 use crate::changes::*;
+use crate::error::Error;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
@@ -255,6 +256,21 @@ impl ChangeEndpoint for GerritRestApi {
             .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
+    }
+
+    fn revert_submission(
+        &mut self, change_id: &str, revert: &RevertInput,
+    ) -> Result<RevertSubmissionInfo> {
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/revert_submission", change_id).as_str(),
+                revert,
+            )?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let revert_submission: RevertSubmissionInfo = serde_json::from_str(&json)?;
+        Ok(revert_submission)
     }
 
     fn submit_change(&mut self, change_id: &str, submit: &SubmitInput) -> Result<ChangeInfo> {
