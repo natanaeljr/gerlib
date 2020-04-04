@@ -23,6 +23,14 @@ impl RestHandler {
         })
     }
 
+    pub fn put(&mut self, url: &str) -> Result<Response> {
+        let (code, message) = self.http.post(url, None)?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
+    }
+
     pub fn put_json<T>(&mut self, url: &str, data: &T) -> Result<Response>
     where
         T: Serialize + ?Sized,

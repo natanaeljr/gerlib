@@ -2,6 +2,7 @@
 
 use crate::accounts::AccountInfo;
 use crate::changes::*;
+use crate::error::Error;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
@@ -407,6 +408,20 @@ impl ChangeEndpoint for GerritRestApi {
         }
         .expect_or(StatusCode::CREATED)?
         .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
+    fn ignore_change(&mut self, change_id: &str) -> Result<()> {
+        self.rest
+            .put(format!("/a/changes/{}/ignore", change_id).as_str())?
+            .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
+    fn unignore_change(&mut self, change_id: &str) -> Result<()> {
+        self.rest
+            .put(format!("/a/changes/{}/unignore", change_id).as_str())?
+            .expect(StatusCode::OK)?;
         Ok(())
     }
 

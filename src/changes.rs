@@ -342,6 +342,16 @@ pub trait ChangeEndpoint {
     /// A message can be specified in the request body inside a `PrivateInput` entity.
     fn mark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
 
+    /// Marks a change as ignored.
+    ///
+    /// The change will not be shown in the incoming reviews dashboard, and email notifications will be suppressed.
+    ///
+    /// Ignoring a change does not cause the change’s "updated" timestamp to be modified, and the owner is not notified.
+    fn ignore_change(&mut self, change_id: &str) -> Result<()>;
+
+    /// Un-marks a change as ignored.
+    fn unignore_change(&mut self, change_id: &str) -> Result<()>;
+
     /// Marks the change to be non-private.
     ///
     /// Note users can only unmark own private changes.
