@@ -51,6 +51,14 @@ impl RestHandler {
         })
     }
 
+    pub fn post(&mut self, url: &str) -> Result<Response> {
+        let (code, message) = self.http.post(url, None)?;
+        Ok(Response {
+            code: StatusCode::from_u16(code as u16).unwrap(),
+            message: message.into(),
+        })
+    }
+
     pub fn delete(&mut self, url: &str) -> Result<Response> {
         self.http.headers(&[Header::AcceptAppJson])?;
         let (code, message) = self.http.delete(url)?;

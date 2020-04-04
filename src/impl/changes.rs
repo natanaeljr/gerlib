@@ -304,6 +304,23 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(submitted_together)
     }
 
+    fn get_included_in(&mut self, change_id: &str) -> Result<IncludedInInfo> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/in", change_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let included_in: IncludedInInfo = serde_json::from_str(&json)?;
+        Ok(included_in)
+    }
+
+    fn index_change(&mut self, change_id: &str) -> Result<()> {
+        self.rest
+            .post(format!("/a/changes/{}/index", change_id).as_str())?
+            .expect(StatusCode::NO_CONTENT)?;
+        Ok(())
+    }
+
     fn list_change_comments(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
         let json = self
             .rest

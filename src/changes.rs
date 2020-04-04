@@ -268,6 +268,14 @@ pub trait ChangeEndpoint {
         &mut self, change_id: &str, additional_opts: Option<&Vec<AdditionalOpt>>,
     ) -> Result<SubmittedTogetherInfo>;
 
+    /// Retrieves the branches and tags in which a change is included.
+    ///
+    /// As result an `IncludedInInfo` entity is returned.
+    fn get_included_in(&mut self, change_id: &str) -> Result<IncludedInInfo>;
+
+    /// Adds or updates the change in the secondary index.
+    fn index_change(&mut self, change_id: &str) -> Result<()>;
+
     /// Lists the published comments of all revisions of the change.
     ///
     /// Returns a map of file paths to lists of `CommentInfo` entries. The entries in the map are
