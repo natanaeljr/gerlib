@@ -342,6 +342,15 @@ pub trait ChangeEndpoint {
     /// A message can be specified in the request body inside a `PrivateInput` entity.
     fn mark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
 
+    /// Marks the change to be non-private.
+    ///
+    /// Note users can only unmark own private changes.
+    ///
+    /// If the change was already not private, the response is “409 Conflict”.
+    ///
+    /// A message can be specified in the request body inside a PrivateInput entity.
+    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
+
     /// Marks a change as ignored.
     ///
     /// The change will not be shown in the incoming reviews dashboard, and email notifications will be suppressed.
@@ -352,14 +361,18 @@ pub trait ChangeEndpoint {
     /// Un-marks a change as ignored.
     fn unignore_change(&mut self, change_id: &str) -> Result<()>;
 
-    /// Marks the change to be non-private.
+    /// Marks a change as reviewed.
     ///
-    /// Note users can only unmark own private changes.
+    /// This allows users to "de-highlight" changes in their dashboard until a new patch set is uploaded.
     ///
-    /// If the change was already not private, the response is “409 Conflict”.
+    /// This differs from the ignore endpoint, which will mute emails and hide the change from dashboard
+    /// completely until it is unignored again.
+    fn mark_as_reviewed(&mut self, change_id: &str) -> Result<()>;
+
+    /// Marks a change as unreviewed.
     ///
-    /// A message can be specified in the request body inside a PrivateInput entity.
-    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
+    /// This allows users to "highlight" changes in their dashboard
+    fn mark_as_unreviewed(&mut self, change_id: &str) -> Result<()>;
 
     /// Lists all the messages of a change including detailed account information.
     ///

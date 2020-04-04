@@ -425,6 +425,20 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(())
     }
 
+    fn mark_as_reviewed(&mut self, change_id: &str) -> Result<()> {
+        self.rest
+            .put(format!("/a/changes/{}/reviewed", change_id).as_str())?
+            .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
+    fn mark_as_unreviewed(&mut self, change_id: &str) -> Result<()> {
+        self.rest
+            .put(format!("/a/changes/{}/unreviewed", change_id).as_str())?
+            .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
     fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
         if let Some(input) = input {
             self.rest.post_json(
