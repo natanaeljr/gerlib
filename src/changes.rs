@@ -305,6 +305,34 @@ pub trait ChangeEndpoint {
     /// At least `id`, `project`, `branch`, and `_number` will be present.
     fn check_change(&mut self, change_id: &str) -> Result<ChangeInfo>;
 
+    /// Performs consistency checks on the change as with `check_change`, and additionally fixes any
+    /// problems that can be fixed automatically. The returned field values reflect any fixes.
+    ///
+    /// Some fixes have options controlling their behavior, which can be set in the `FixInput` entity body.
+    ///
+    /// Only the change owner, a project owner, or an administrator may fix changes.
+    fn fix_change(&mut self, change_id: &str) -> Result<ChangeInfo>;
+
+    /// Marks the change as not ready for review yet.
+    ///
+    /// Changes may only be marked not ready by the owner, project owners or site administrators.
+    ///
+    /// The request body does not need to include a `WorkInProgressInput` entity if no review comment is added.
+    /// Actions that create a new patch set in a WIP change default to notifying **OWNER** instead of **ALL**.
+    fn set_work_in_progress(
+        &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
+    ) -> Result<()>;
+
+    /// Marks the change as ready for review (set WIP property to false).
+    ///
+    /// Changes may only be marked ready by the owner, project owners or site administrators.
+    ///
+    /// Activates notifications of reviewer. The request body does not need to include a `WorkInProgressInput`
+    /// entity if no review comment is added.
+    fn set_ready_for_review(
+        &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
+    ) -> Result<()>;
+
     /// Lists all the messages of a change including detailed account information.
     ///
     /// As response a list of `ChangeMessageInfo` entities is returned.

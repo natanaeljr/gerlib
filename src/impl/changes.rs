@@ -363,6 +363,40 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(changes)
     }
 
+    fn fix_change(&mut self, change_id: &str) -> Result<ChangeInfo> {
+        let json = self
+            .rest
+            .post(format!("/a/changes/{}/check", change_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let changes: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(changes)
+    }
+
+    fn set_work_in_progress(
+        &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
+    ) -> Result<()> {
+        let url = format!("/a/changes/{}/wip", change_id);
+        if let Some(input) = input {
+            self.rest.post_json(&url, input)?.expect(StatusCode::OK)?;
+        } else {
+            self.rest.post(&url)?.expect(StatusCode::OK)?;
+        }
+        Ok(())
+    }
+
+    fn set_ready_for_review(
+        &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
+    ) -> Result<()> {
+        let url = format!("/a/changes/{}/ready", change_id);
+        if let Some(input) = input {
+            self.rest.post_json(&url, input)?.expect(StatusCode::OK)?;
+        } else {
+            self.rest.post(&url)?.expect(StatusCode::OK)?;
+        }
+        Ok(())
+    }
+
     fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {
         let json = self
             .rest
