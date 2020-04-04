@@ -217,7 +217,7 @@ pub trait ChangeEndpoint {
     /// There are no guarantees about the subjects if the users change the default subjects.
     ///
     /// Details for the revert can be specified in the request body inside a `RevertInput`.
-    /// The topic of all created revert changes will be revert-{submission_id}-{random_string_of_size_10}.
+    /// The topic of all created revert changes will be `revert-{submission_id}-{random_string_of_size_10}`.
     ///
     /// The changes will not be rebased on onto the destination branch so the users may still have to
     /// manually rebase them to resolve conflicts and make them submittable.
@@ -228,7 +228,7 @@ pub trait ChangeEndpoint {
     ///
     /// There is one special case that involves merge commits; if a user has multiple changes in the
     /// same project and branch, but not in the same change series, those changes can still get submitted
-    /// together if they have the same topic and change.submitWholeTopic in gerrit.config is set to true.
+    /// together if they have the same topic and `change.submitWholeTopic` in gerrit.config is set to true.
     /// In the case, Gerrit may create merge commits on submit (depending on the submit types of the project).
     /// The first parent for the reverts will be the most recent merge commit that was created by Gerrit to
     /// merge the different change series into the target branch.
@@ -885,7 +885,7 @@ pub struct CommentInput {
     /// The URL encoded UUID of the comment if an existing draft comment should be updated.
     pub id: Option<String>,
     /// The path of the file for which the inline comment should be added.
-    /// Doesn’t need to be set if contained in a map where the key is the file path.    
+    /// Doesn’t need to be set if contained in a map where the key is the file path.
     pub path: Option<String>,
     /// The side on which the comment was added.
     /// Allowed values are REVISION and PARENT. If not set, the default is REVISION.

@@ -2,12 +2,10 @@
 
 use crate::accounts::AccountInfo;
 use crate::changes::*;
-use crate::error::Error;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
 use std::collections::BTreeMap;
-use url::quirks::hash;
 
 /// Implement trait [ChangeEndpoint](trait.ChangeEndpoint.html) for Gerrit REST API.
 impl ChangeEndpoint for GerritRestApi {
