@@ -374,6 +374,22 @@ pub trait ChangeEndpoint {
     /// This allows users to "highlight" changes in their dashboard
     fn mark_as_unreviewed(&mut self, change_id: &str) -> Result<()>;
 
+    /// Gets the hashtags associated with a change.
+    ///
+    /// NOTE: Hashtags are only available when NoteDb is enabled.
+    ///
+    /// As response the change's hashtags are returned as a list of strings.
+    fn get_hashtags(&mut self, change_id: &str) -> Result<Vec<String>>;
+
+    /// Adds and/or removes hashtags from a change.
+    ///
+    /// NOTE: Hashtags are only available when NoteDb is enabled.
+    ///
+    /// The hashtags to add or remove must be provided in the request body inside a `HashtagsInput` entity.
+    ///
+    /// As response the change's hashtags are returned as a list of strings.
+    fn set_hashtags(&mut self, change_id: &str, input: &HashtagsInput) -> Result<Vec<String>>;
+
     /// Lists all the messages of a change including detailed account information.
     ///
     /// As response a list of `ChangeMessageInfo` entities is returned.

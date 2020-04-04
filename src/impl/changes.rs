@@ -7,6 +7,7 @@ use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
 use std::collections::BTreeMap;
+use url::quirks::hash;
 
 /// Implement trait [ChangeEndpoint](trait.ChangeEndpoint.html) for Gerrit REST API.
 impl ChangeEndpoint for GerritRestApi {
@@ -411,6 +412,20 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(())
     }
 
+    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
+        if let Some(input) = input {
+            self.rest.post_json(
+                format!("/a/changes/{}/private.delete", change_id).as_str(),
+                input,
+            )?
+        } else {
+            self.rest
+                .delete(format!("/a/changes/{}/private", change_id).as_str())?
+        }
+        .expect(StatusCode::NO_CONTENT)?;
+        Ok(())
+    }
+
     fn ignore_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
             .put(format!("/a/changes/{}/ignore", change_id).as_str())?
@@ -439,18 +454,24 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(())
     }
 
-    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
-        if let Some(input) = input {
-            self.rest.post_json(
-                format!("/a/changes/{}/private.delete", change_id).as_str(),
-                input,
-            )?
-        } else {
-            self.rest
-                .delete(format!("/a/changes/{}/private", change_id).as_str())?
-        }
-        .expect(StatusCode::NO_CONTENT)?;
-        Ok(())
+    fn get_hashtags(&mut self, change_id: &str) -> Result<Vec<String>> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/hashtags", change_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let hashtags: Vec<String> = serde_json::from_str(&json)?;
+        Ok(hashtags)
+    }
+
+    fn set_hashtags(&mut self, change_id: &str, input: &HashtagsInput) -> Result<Vec<String>> {
+        let json = self
+            .rest
+            .post_json(format!("/a/changes/{}/hashtags", change_id).as_str(), input)?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let hashtags: Vec<String> = serde_json::from_str(&json)?;
+        Ok(hashtags)
     }
 
     fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {
