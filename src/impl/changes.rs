@@ -8,7 +8,7 @@ use ::http::StatusCode;
 use serde_derive::Serialize;
 use std::collections::BTreeMap;
 
-/// Implement the Change Endpoint for Gerrit REST API.
+/// Implement trait [ChangeEndpoint](trait.ChangeEndpoint.html) for Gerrit REST API.
 impl ChangeEndpoint for GerritRestApi {
     fn create_change(&mut self, change: &ChangeInput) -> Result<ChangeInfo> {
         let json = self
@@ -281,6 +281,27 @@ impl ChangeEndpoint for GerritRestApi {
             .json()?;
         let change_info: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change_info)
+    }
+
+    fn changes_submitted_together(
+        &mut self, change_id: &str, additional_opts: Option<&Vec<AdditionalOpt>>,
+    ) -> Result<SubmittedTogetherInfo> {
+        #[derive(Serialize)]
+        pub struct Query<'a> {
+            #[serde(rename = "o", skip_serializing_if = "Option::is_none")]
+            pub additional_opts: Option<&'a Vec<AdditionalOpt>>,
+        }
+        let query = Query { additional_opts };
+        let params = serde_url_params::to_string(&query)?;
+        let url = format!(
+            "/a/changes/{}/submitted_together?o=NON_VISIBLE_CHANGES{}{}",
+            change_id,
+            if params.is_empty() { "" } else { "&" },
+            params
+        );
+        let json = self.rest.get(&url)?.expect(StatusCode::OK)?.json()?;
+        let submitted_together: SubmittedTogetherInfo = serde_json::from_str(&json)?;
+        Ok(submitted_together)
     }
 
     fn list_change_comments(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {

@@ -248,6 +248,26 @@ pub trait ChangeEndpoint {
     /// the response is “409 Conflict” and the error message is contained in the response body.
     fn submit_change(&mut self, change_id: &str, submit: &SubmitInput) -> Result<ChangeInfo>;
 
+    /// Computes list of all changes which are submitted when Submit is called for this change,
+    /// including the current change itself.
+    ///
+    /// The list consists of:
+    ///  * The given change.
+    ///  * If `change.submitWholeTopic` is enabled, include all open changes with the same topic.
+    ///  * For each change whose submit type is not CHERRY_PICK, include unmerged ancestors targeting the same branch.
+    ///
+    /// As a special case, the list is empty if this change would be submitted by itself (without other changes).
+    ///
+    /// As a response a `SubmittedTogetherInfo` entity is returned that describes what would happen
+    /// if the change were submitted. This response contains a list of changes and a count of changes
+    /// that are not visible to the caller that are part of the set of changes to be merged.
+    ///
+    /// The listed changes use the same format as in Query Changes with the LABELS, DETAILED_LABELS,
+    /// CURRENT_REVISION, and SUBMITTABLE options set.
+    fn changes_submitted_together(
+        &mut self, change_id: &str, additional_opts: Option<&Vec<AdditionalOpt>>,
+    ) -> Result<SubmittedTogetherInfo>;
+
     /// Lists the published comments of all revisions of the change.
     ///
     /// Returns a map of file paths to lists of `CommentInfo` entries. The entries in the map are
