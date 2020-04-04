@@ -333,6 +333,24 @@ pub trait ChangeEndpoint {
         &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
     ) -> Result<()>;
 
+    /// Marks the change to be private.
+    ///
+    /// Only open changes can be marked private.
+    ///
+    /// Changes may only be marked private by the owner or site administrators.
+    ///
+    /// A message can be specified in the request body inside a `PrivateInput` entity.
+    fn mark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
+
+    /// Marks the change to be non-private.
+    ///
+    /// Note users can only unmark own private changes.
+    ///
+    /// If the change was already not private, the response is “409 Conflict”.
+    ///
+    /// A message can be specified in the request body inside a PrivateInput entity.
+    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()>;
+
     /// Lists all the messages of a change including detailed account information.
     ///
     /// As response a list of `ChangeMessageInfo` entities is returned.

@@ -80,13 +80,17 @@ pub struct Response {
 
 impl Response {
     pub fn expect(self, expected_code: http::StatusCode) -> Result<Message> {
+        Ok(self.expect_or(expected_code)?.message)
+    }
+
+    pub fn expect_or(self, expected_code: http::StatusCode) -> Result<Self> {
         if self.code.as_u16() != expected_code.as_u16() {
             Err(Error::UnexpectedHttpResponse(
                 self.code,
                 self.message.string(),
             ))
         } else {
-            Ok(self.message)
+            Ok(self)
         }
     }
 }

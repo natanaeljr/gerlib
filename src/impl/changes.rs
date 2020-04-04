@@ -2,7 +2,6 @@
 
 use crate::accounts::AccountInfo;
 use crate::changes::*;
-use crate::error::Error;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
@@ -378,10 +377,11 @@ impl ChangeEndpoint for GerritRestApi {
     ) -> Result<()> {
         let url = format!("/a/changes/{}/wip", change_id);
         if let Some(input) = input {
-            self.rest.post_json(&url, input)?.expect(StatusCode::OK)?;
+            self.rest.post_json(&url, input)?
         } else {
-            self.rest.post(&url)?.expect(StatusCode::OK)?;
+            self.rest.post(&url)?
         }
+        .expect(StatusCode::OK)?;
         Ok(())
     }
 
@@ -390,10 +390,37 @@ impl ChangeEndpoint for GerritRestApi {
     ) -> Result<()> {
         let url = format!("/a/changes/{}/ready", change_id);
         if let Some(input) = input {
-            self.rest.post_json(&url, input)?.expect(StatusCode::OK)?;
+            self.rest.post_json(&url, input)?
         } else {
-            self.rest.post(&url)?.expect(StatusCode::OK)?;
+            self.rest.post(&url)?
         }
+        .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
+    fn mark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
+        let url = format!("/a/changes/{}/private", change_id);
+        if let Some(input) = input {
+            self.rest.post_json(&url, input)?
+        } else {
+            self.rest.post(&url)?
+        }
+        .expect_or(StatusCode::CREATED)?
+        .expect(StatusCode::OK)?;
+        Ok(())
+    }
+
+    fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
+        if let Some(input) = input {
+            self.rest.post_json(
+                format!("/a/changes/{}/private.delete", change_id).as_str(),
+                input,
+            )?
+        } else {
+            self.rest
+                .delete(format!("/a/changes/{}/private", change_id).as_str())?
+        }
+        .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
 
