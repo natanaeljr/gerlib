@@ -331,6 +331,18 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(comments)
     }
 
+    fn list_change_robot_comments(
+        &mut self, change_id: &str,
+    ) -> Result<BTreeMap<String, RobotCommentInfo>> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/robotcomments", change_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let robot_comments: BTreeMap<String, RobotCommentInfo> = serde_json::from_str(&json)?;
+        Ok(robot_comments)
+    }
+
     fn list_change_drafts(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
         let json = self
             .rest
@@ -339,6 +351,16 @@ impl ChangeEndpoint for GerritRestApi {
             .json()?;
         let drafts: BTreeMap<String, CommentInfo> = serde_json::from_str(&json)?;
         Ok(drafts)
+    }
+
+    fn check_change(&mut self, change_id: &str) -> Result<ChangeInfo> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/check", change_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let changes: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(changes)
     }
 
     fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {

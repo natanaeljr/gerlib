@@ -283,12 +283,27 @@ pub trait ChangeEndpoint {
     /// Each comment has the patch_set and author fields set.
     fn list_change_comments(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>>;
 
+    /// Lists the robot comments of all revisions of the change.
+    ///
+    /// Return a map that maps the file path to a list of RobotCommentInfo entries.
+    /// The entries in the map are sorted by file path.
+    fn list_change_robot_comments(
+        &mut self, change_id: &str,
+    ) -> Result<BTreeMap<String, RobotCommentInfo>>;
+
     /// Lists the draft comments of all revisions of the change that belong to the calling user.
     ///
     /// Returns a map of file paths to lists of `CommentInfo` entries.
     /// The entries in the map are sorted by file path, and the comments for each path are sorted by
     /// patch set number. Each comment has the `patch_set` field set, and no `author`.
     fn list_change_drafts(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>>;
+
+    /// Performs consistency checks on the change, and returns a ChangeInfo entity with the problems field
+    /// set to a list of ProblemInfo entities.
+    ///
+    /// Depending on the type of problem, some fields not marked optional may be missing from the result.
+    /// At least `id`, `project`, `branch`, and `_number` will be present.
+    fn check_change(&mut self, change_id: &str) -> Result<ChangeInfo>;
 
     /// Lists all the messages of a change including detailed account information.
     ///
