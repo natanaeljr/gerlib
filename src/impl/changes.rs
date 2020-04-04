@@ -4,6 +4,7 @@ use crate::accounts::AccountInfo;
 use crate::changes::*;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
+use serde_derive::Serialize;
 use std::collections::BTreeMap;
 
 /// Implement the Change Endpoint for Gerrit REST API.
@@ -77,6 +78,30 @@ impl ChangeEndpoint for GerritRestApi {
         Ok(change_info)
     }
 
+    fn create_merge_patch_set(
+        &mut self, change_id: &str, input: &MergePatchSetInput,
+    ) -> Result<ChangeInfo> {
+        let json = self
+            .rest
+            .post_json(format!("/a/changes/{}/merge", change_id).as_str(), input)?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let change: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(change)
+    }
+
+    fn set_commit_message(
+        &mut self, change_id: &str, input: &CommitMessageInput,
+    ) -> Result<ChangeInfo> {
+        let json = self
+            .rest
+            .put_json(format!("/a/changes/{}/message", change_id).as_str(), input)?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let change: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(change)
+    }
+
     fn delete_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
             .delete(format!("/a/changes/{}", change_id).as_str())?
@@ -85,7 +110,7 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn get_topic(&mut self, change_id: &str) -> Result<String> {
-        let json = &self
+        let json = self
             .rest
             .get(format!("/a/changes/{}/topic", change_id).as_str())?
             .expect(StatusCode::OK)?
@@ -95,7 +120,7 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn set_topic(&mut self, change_id: &str, topic: &TopicInput) -> Result<String> {
-        let json = &self
+        let json = self
             .rest
             .put_json(format!("/a/changes/{}/topic", change_id).as_str(), topic)?
             .expect(StatusCode::OK)?
@@ -112,7 +137,7 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn get_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
-        let json = &self
+        let json = self
             .rest
             .get(format!("/a/changes/{}/assignee", change_id).as_str())?
             .expect(StatusCode::OK)?
@@ -122,7 +147,7 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn get_past_assignees(&mut self, change_id: &str) -> Result<Vec<AccountInfo>> {
-        let json = &self
+        let json = self
             .rest
             .get(format!("/a/changes/{}/past_assignees", change_id).as_str())?
             .expect(StatusCode::OK)?
@@ -132,7 +157,7 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn set_assignee(&mut self, change_id: &str, assignee: &AssigneeInput) -> Result<AccountInfo> {
-        let json = &self
+        let json = self
             .rest
             .put_json(
                 format!("/a/changes/{}/assignee", change_id).as_str(),
@@ -145,13 +170,32 @@ impl ChangeEndpoint for GerritRestApi {
     }
 
     fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
-        let json = &self
+        let json = self
             .rest
             .delete(format!("/a/changes/{}/assignee", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let assignee: AccountInfo = serde_json::from_str(&json)?;
         Ok(assignee)
+    }
+
+    fn get_pure_revert(&mut self, change_id: &str, commit: Option<&str>) -> Result<PureRevertInfo> {
+        #[derive(Serialize)]
+        pub struct Query<'a> {
+            #[serde(rename = "o", skip_serializing_if = "Option::is_none")]
+            pub option: Option<&'a str>,
+        }
+        let query = Query { option: commit };
+        let params = serde_url_params::to_string(&query)?;
+        let url = format!(
+            "/a/changes/{}/pure_revert{}{}",
+            change_id,
+            if params.is_empty() { "" } else { "?" },
+            params
+        );
+        let json = self.rest.get(&url)?.expect(StatusCode::OK)?.json()?;
+        let pure_revert: PureRevertInfo = serde_json::from_str(&json)?;
+        Ok(pure_revert)
     }
 
     fn abandon_change(&mut self, change_id: &str, abandon: &AbandonInput) -> Result<ChangeInfo> {

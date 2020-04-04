@@ -67,6 +67,25 @@ pub trait ChangeEndpoint {
         &mut self, change_id: &str, additional_opts: Option<Vec<AdditionalOpt>>,
     ) -> Result<ChangeInfo>;
 
+    /// Update an existing change by using a `MergePatchSetInput` entity.
+    ///
+    /// Gerrit will create a merge commit based on the information of `MergePatchSetInput` and add
+    /// a new patch set to the change corresponding to the new merge commit.
+    ///
+    /// As response a `ChangeInfo` entity with current revision is returned that describes the resulting change.
+    fn create_merge_patch_set(
+        &mut self, change_id: &str, input: &MergePatchSetInput,
+    ) -> Result<ChangeInfo>;
+
+    /// Creates a new patch set with a new commit message.
+    ///
+    /// The new commit message must be provided in the request body inside a CommitMessageInput entity.
+    /// If a Change-Id footer is specified, it must match the current Change-Id footer.
+    /// If the Change-Id footer is absent, the current Change-Id is added to the message.
+    fn set_commit_message(
+        &mut self, change_id: &str, input: &CommitMessageInput,
+    ) -> Result<ChangeInfo>;
+
     /// Deletes a change.
     ///
     /// New or abandoned changes can be deleted by their owner if the user is granted the
@@ -114,6 +133,15 @@ pub trait ChangeEndpoint {
     ///
     /// If the change had no assignee the response is “204 No Content”.
     fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo>;
+
+    /// Check if the given change is a pure revert of the change it references in revertOf.
+    ///
+    /// Optionally, the query parameter `o` can be passed in to specify a commit (SHA1 in 40 digit hex representation)
+    /// to check against. It takes precedence over revertOf. If the change has no reference in revertOf,
+    /// the parameter is mandatory.
+    ///
+    /// As response a PureRevertInfo entity is returned.
+    fn get_pure_revert(&mut self, change_id: &str, commit: Option<&str>) -> Result<PureRevertInfo>;
 
     /// Abandons a change.
     ///
