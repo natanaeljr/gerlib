@@ -419,6 +419,26 @@ pub trait ChangeEndpoint {
     /// As result a list of `ReviewerInfo` entries is returned.
     fn list_reviewers(&mut self, change_id: &str) -> Result<Vec<ReviewerInfo>>;
 
+    /// Suggest the reviewers for a given query q and result limit n.
+    ///
+    /// If result limit is not passed, then the default 10 is used.
+    ///
+    /// This REST endpoint only suggests accounts that:
+    ///  * are active
+    ///  * can see the change
+    ///  * are visible to the calling user
+    ///  * are not already reviewer on the change
+    ///  * don’t own the change
+    ///
+    /// Groups can be excluded from the results by specifying the 'exclude-groups' request parameter.
+    ///
+    /// To suggest CCs reviewer-state=CC can be specified as additional URL parameter.
+    /// This includes existing reviewers in the result, but excludes existing CCs.
+    fn suggest_reviewers(
+        &mut self, change_id: &str, query_str: &str, limit: Option<u32>, exclude_groups: bool,
+        cc: bool,
+    ) -> Result<Vec<SuggestedReviewerInfo>>;
+
     /// Retrieves a reviewer of a change.
     ///
     /// As response a `ReviewerInfo` entity is returned that describes the reviewer.

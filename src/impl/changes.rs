@@ -5,6 +5,7 @@ use crate::changes::*;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
+use serde_with::skip_serializing_none;
 use std::collections::BTreeMap;
 
 /// Implement trait [ChangeEndpoint](trait.ChangeEndpoint.html) for Gerrit REST API.
@@ -522,6 +523,40 @@ impl ChangeEndpoint for GerritRestApi {
             .expect(StatusCode::OK)?
             .json()?;
         let reviewers: Vec<ReviewerInfo> = serde_json::from_str(&json)?;
+        Ok(reviewers)
+    }
+
+    fn suggest_reviewers(
+        &mut self, change_id: &str, query_str: &str, limit: Option<u32>, exclude_groups: bool,
+        cc: bool,
+    ) -> Result<Vec<SuggestedReviewerInfo>> {
+        #[skip_serializing_none]
+        #[derive(Serialize)]
+        pub struct Query<'a> {
+            #[serde(rename = "q")]
+            pub query_str: &'a str,
+            #[serde(rename = "n")]
+            pub limit: Option<u32>,
+            #[serde(rename = "exclude-groups")]
+            pub exclude_groups: Option<()>,
+            #[serde(rename = "reviewer-state")]
+            pub reviewer_state: Option<&'static str>,
+        }
+        let query = Query {
+            query_str,
+            limit,
+            exclude_groups: if exclude_groups { Some(()) } else { None },
+            reviewer_state: if cc { Some("CC") } else { None },
+        };
+        let params = serde_url_params::to_string(&query)?;
+        let url = format!(
+            "/a/changes/{}/suggest_reviewers{}{}",
+            change_id,
+            if params.is_empty() { "" } else { "?" },
+            params
+        );
+        let json = self.rest.get(&url)?.expect(StatusCode::OK)?.json()?;
+        let reviewers: Vec<SuggestedReviewerInfo> = serde_json::from_str(&json)?;
         Ok(reviewers)
     }
 
