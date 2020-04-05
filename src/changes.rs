@@ -467,6 +467,22 @@ pub trait ChangeEndpoint {
     fn delete_reviewer(
         &mut self, change_id: &str, account_id: &str, input: Option<&DeleteReviewerInput>,
     ) -> Result<()>;
+
+    /// Lists the votes for a specific reviewer of the change.
+    ///
+    /// As result a map is returned that maps the label name to the label value.
+    /// The entries in the map are sorted by label name.
+    fn list_votes(&mut self, change_id: &str, account_id: &str) -> Result<BTreeMap<String, i32>>;
+
+    /// Deletes a single vote from a change.
+    ///
+    /// Note that even when the last vote of a reviewer is removed the reviewer itself is still listed on the change.
+    ///
+    /// Options can be provided in the request body as a `DeleteVoteInput` entity.
+    fn delete_vote(
+        &mut self, change_id: &str, account_id: &str, label_id: &str,
+        input: Option<&DeleteVoteInput>,
+    ) -> Result<()>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

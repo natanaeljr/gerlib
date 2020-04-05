@@ -2,6 +2,7 @@
 
 use crate::accounts::AccountInfo;
 use crate::changes::*;
+use crate::error::Error;
 use crate::{GerritRestApi, Result};
 use ::http::StatusCode;
 use serde_derive::Serialize;
@@ -600,6 +601,34 @@ impl ChangeEndpoint for GerritRestApi {
                 .delete(format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str())?
                 .expect(StatusCode::NO_CONTENT)?
         };
+        Ok(())
+    }
+
+    fn list_votes(&mut self, change_id: &str, account_id: &str) -> Result<BTreeMap<String, i32>> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/reviewers/{}/votes/", change_id, account_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let votes: BTreeMap<String, i32> = serde_json::from_str(&json)?;
+        Ok(votes)
+    }
+
+    fn delete_vote(
+        &mut self, change_id: &str, account_id: &str, label_id: &str,
+        input: Option<&DeleteVoteInput>,
+    ) -> Result<()> {
+        let url = format!(
+            "/a/changes/{}/reviewers/{}/votes/{}",
+            change_id, account_id, label_id
+        );
+        if let Some(input) = input {
+            self.rest
+                .post_json(format!("{}/delete", url).as_str(), input)?
+        } else {
+            self.rest.delete(&url)?
+        }
+        .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
 }
