@@ -492,6 +492,20 @@ pub trait ChangeEndpoints {
     /// the additional field web_links.
     fn get_commit(&mut self, change_id: &str, revision_id: &str, links: bool)
         -> Result<CommitInfo>;
+
+    /// Retrieves the description of a patch set.
+    ///
+    /// If the patch set does not have a description an empty string is returned.
+    fn get_description(&mut self, change_id: &str, revision_id: &str) -> Result<String>;
+
+    /// Sets the description of a patch set.
+    ///
+    /// The new description must be provided in the request body inside a `DescriptionInput` entity.
+    ///
+    /// As response the new description is returned.
+    fn set_description(
+        &mut self, change_id: &str, revision_id: &str, input: &DescriptionInput,
+    ) -> Result<String>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

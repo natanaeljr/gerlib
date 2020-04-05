@@ -656,4 +656,39 @@ impl ChangeEndpoints for GerritRestApi {
         let commit: CommitInfo = serde_json::from_str(&json)?;
         Ok(commit)
     }
+
+    fn get_description(&mut self, change_id: &str, revision_id: &str) -> Result<String> {
+        let json = self
+            .rest
+            .get(
+                format!(
+                    "/a/changes/{}/revisions/{}/description",
+                    change_id, revision_id
+                )
+                .as_str(),
+            )?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let description: String = serde_json::from_str(&json)?;
+        Ok(description)
+    }
+
+    fn set_description(
+        &mut self, change_id: &str, revision_id: &str, input: &DescriptionInput,
+    ) -> Result<String> {
+        let json = self
+            .rest
+            .put_json(
+                format!(
+                    "/a/changes/{}/revisions/{}/description",
+                    change_id, revision_id
+                )
+                .as_str(),
+                input,
+            )?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let description: String = serde_json::from_str(&json)?;
+        Ok(description)
+    }
 }
