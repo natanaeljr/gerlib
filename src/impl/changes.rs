@@ -631,4 +631,29 @@ impl ChangeEndpoints for GerritRestApi {
         .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
+
+    fn get_commit(
+        &mut self, change_id: &str, revision_id: &str, links: bool,
+    ) -> Result<CommitInfo> {
+        #[skip_serializing_none]
+        #[derive(Serialize)]
+        pub struct Query {
+            pub links: Option<()>,
+        }
+        let query = Query {
+            links: if links { Some(()) } else { None },
+        };
+        let params = serde_url_params::to_string(&query)?;
+        let url = format!(
+            "/a/changes/{}/revisions/{}/commit{}{}",
+            change_id,
+            revision_id,
+            if params.is_empty() { "" } else { "?" },
+            params
+        );
+
+        let json = self.rest.get(&url)?.expect(StatusCode::OK)?.json()?;
+        let commit: CommitInfo = serde_json::from_str(&json)?;
+        Ok(commit)
+    }
 }

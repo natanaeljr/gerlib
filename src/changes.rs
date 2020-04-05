@@ -483,6 +483,15 @@ pub trait ChangeEndpoints {
         &mut self, change_id: &str, account_id: &str, label_id: &str,
         input: Option<&DeleteVoteInput>,
     ) -> Result<()>;
+
+    /// Retrieves a parsed commit of a revision.
+    ///
+    /// As response a `CommitInfo` entity is returned that describes the revision.
+    ///
+    /// Adding query parameter links (for example /changes/…​/commit?links) returns a `CommitInfo` with
+    /// the additional field web_links.
+    fn get_commit(&mut self, change_id: &str, revision_id: &str, links: bool)
+        -> Result<CommitInfo>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
