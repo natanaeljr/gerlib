@@ -1,6 +1,6 @@
-//! Change Endpoint module.
+//! Change related REST endpoints.
 //!
-//! See [ChangeEndpoint](trait.ChangeEndpoint.html) trait for the REST API.
+//! See [ChangeEndpoints](trait.ChangeEndpoints.html) trait for the REST API.
 
 use crate::accounts::{AccountInfo, AccountInput, GpgKeyInfo};
 use crate::details::Timestamp;
@@ -16,7 +16,7 @@ use std::fmt::{Display, Error, Formatter};
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// This trait describes the change related REST endpoints.
-pub trait ChangeEndpoint {
+pub trait ChangeEndpoints {
     /// Create a new change.
     ///
     /// The change input `ChangeInput` entity must be provided.

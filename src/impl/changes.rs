@@ -9,8 +9,8 @@ use serde_derive::Serialize;
 use serde_with::skip_serializing_none;
 use std::collections::BTreeMap;
 
-/// Implement trait [ChangeEndpoint](trait.ChangeEndpoint.html) for Gerrit REST API.
-impl ChangeEndpoint for GerritRestApi {
+/// Implement trait [ChangeEndpoints](trait.ChangeEndpoints.html) for Gerrit REST API.
+impl ChangeEndpoints for GerritRestApi {
     fn create_change(&mut self, change: &ChangeInput) -> Result<ChangeInfo> {
         let json = self
             .rest
