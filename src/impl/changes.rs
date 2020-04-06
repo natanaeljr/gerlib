@@ -691,4 +691,20 @@ impl ChangeEndpoints for GerritRestApi {
         let description: String = serde_json::from_str(&json)?;
         Ok(description)
     }
+
+    fn get_merge_list(&mut self, change_id: &str, revision_id: &str) -> Result<Vec<CommitInfo>> {
+        let json = self
+            .rest
+            .get(
+                format!(
+                    "/a/changes/{}/reviewers/{}/mergelist",
+                    change_id, revision_id
+                )
+                .as_str(),
+            )?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let list: Vec<CommitInfo> = serde_json::from_str(&json)?;
+        Ok(list)
+    }
 }

@@ -506,6 +506,15 @@ pub trait ChangeEndpoints {
     fn set_description(
         &mut self, change_id: &str, revision_id: &str, input: &DescriptionInput,
     ) -> Result<String>;
+
+    /// Returns the list of commits that are being integrated into a target branch by a merge commit.
+    ///
+    /// By default the first parent is assumed to be uninteresting. By using the parent option another
+    /// parent can be set as uninteresting (parents are 1-based).
+    ///
+    /// The list of commits is returned as a list of `CommitInfo` entities.
+    /// Web links are only included if the links option was set.
+    fn get_merge_list(&mut self, change_id: &str, revision_id: &str) -> Result<Vec<CommitInfo>>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
