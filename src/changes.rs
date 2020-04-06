@@ -551,6 +551,15 @@ pub trait ChangeEndpoints {
     fn set_review(
         &mut self, change_id: &str, revision_id: &str, input: &ReviewInput,
     ) -> Result<ReviewResult>;
+
+    /// Retrieves related changes of a revision.
+    ///
+    /// Related changes are changes that either depend on, or are dependencies of the revision.
+    ///
+    /// As result a RelatedChangesInfo entity is returned describing the related changes.
+    fn get_related_changes(
+        &mut self, change_id: &str, revision_id: &str,
+    ) -> Result<RelatedChangesInfo>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
