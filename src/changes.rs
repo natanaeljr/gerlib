@@ -560,6 +560,19 @@ pub trait ChangeEndpoints {
     fn get_related_changes(
         &mut self, change_id: &str, revision_id: &str,
     ) -> Result<RelatedChangesInfo>;
+
+    /// Rebases a revision.
+    ///
+    /// Optionally, the parent revision can be changed to another patch set through the `RebaseInput` entity.
+    ///
+    /// As response a `ChangeInfo` entity is returned that describes the rebased change.
+    /// Information about the current patch set is included.
+    ///
+    /// If the revision cannot be rebased, e.g. due to conflicts, the response is “409 Conflict” and the error
+    /// message is contained in the response body.
+    fn rebase_revision(
+        &mut self, change_id: &str, revision_id: &str, input: Option<&RebaseInput>,
+    ) -> Result<ChangeInfo>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

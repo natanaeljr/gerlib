@@ -756,4 +756,19 @@ impl ChangeEndpoints for GerritRestApi {
         let related: RelatedChangesInfo = serde_json::from_str(&json)?;
         Ok(related)
     }
+
+    fn rebase_revision(
+        &mut self, change_id: &str, revision_id: &str, input: Option<&RebaseInput>,
+    ) -> Result<ChangeInfo> {
+        let url = format!("/a/changes/{}/revisions/{}/rebase", change_id, revision_id);
+        let json = if let Some(input) = input {
+            self.rest.post_json(&url, input)?
+        } else {
+            self.rest.post(&url)?
+        }
+        .expect(StatusCode::OK)?
+        .json()?;
+        let change: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(change)
+    }
 }
