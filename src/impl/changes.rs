@@ -771,4 +771,14 @@ impl ChangeEndpoints for GerritRestApi {
         let change: ChangeInfo = serde_json::from_str(&json)?;
         Ok(change)
     }
+
+    fn submit_revision(&mut self, change_id: &str, revision_id: &str) -> Result<SubmitInfo> {
+        let json = self
+            .rest
+            .post(format!("/a/changes/{}/revisions/{}/submit", change_id, revision_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let submit: SubmitInfo = serde_json::from_str(&json)?;
+        Ok(submit)
+    }
 }

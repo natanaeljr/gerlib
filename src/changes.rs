@@ -573,6 +573,15 @@ pub trait ChangeEndpoints {
     fn rebase_revision(
         &mut self, change_id: &str, revision_id: &str, input: Option<&RebaseInput>,
     ) -> Result<ChangeInfo>;
+
+    /// Submits a revision.
+    ///
+    /// As response a `SubmitInfo` entity is returned that describes the status of the submitted change.
+    ///
+    /// If the revision cannot be submitted, e.g. because the submit rule doesn’t allow submitting the revision
+    /// or the revision is not the current revision, the response is “409 Conflict” and the error message is
+    /// contained in the response body.
+    fn submit_revision(&mut self, change_id: &str, revision_id: &str) -> Result<SubmitInfo>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
