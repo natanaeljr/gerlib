@@ -515,6 +515,13 @@ pub trait ChangeEndpoints {
     /// The list of commits is returned as a list of `CommitInfo` entities.
     /// Web links are only included if the links option was set.
     fn get_merge_list(&mut self, change_id: &str, revision_id: &str) -> Result<Vec<CommitInfo>>;
+
+    /// Retrieves revision actions of the revision of a change.
+    ///
+    /// The response is a flat map of possible revision actions mapped to their `ActionInfo`.
+    fn get_revision_actions(
+        &mut self, change_id: &str, revision_id: &str,
+    ) -> Result<BTreeMap<String, ActionInfo>>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
