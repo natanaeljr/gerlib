@@ -522,6 +522,35 @@ pub trait ChangeEndpoints {
     fn get_revision_actions(
         &mut self, change_id: &str, revision_id: &str,
     ) -> Result<BTreeMap<String, ActionInfo>>;
+
+    /// Retrieves a review of a revision.
+    ///
+    /// As response a `ChangeInfo` entity with `detailed labels` and `detailed accounts` is returned that
+    /// describes the review of the revision. The revision for which the review is retrieved is contained
+    /// in the revisions field. In addition the `current_revision` field is set if the revision for which
+    /// the review is retrieved is the current revision of the change.
+    /// Please note that the returned labels are always for the current patch set.
+    fn get_review(&mut self, change_id: &str, revision_id: &str) -> Result<ChangeInfo>;
+
+    /// Sets a review on a revision, optionally also publishing draft comments, setting labels, adding reviewers or
+    /// CCs, and modifying the work in progress property.
+    ///
+    /// The review must be provided in the request body as a `ReviewInput` entity.
+    ///
+    /// If the labels are set, the user sending the request will automatically be added as a reviewer,
+    /// otherwise (if they only commented) they are added to the CC list.
+    ///
+    /// A review cannot be set on a change edit. Trying to post a review for a change edit fails with 409 Conflict.
+    ///
+    /// As response a `ReviewResult` entity is returned that describes the applied labels and any added reviewers
+    /// (e.g. yourself, if you set a label but weren’t previously a reviewer on this CL).
+    ///
+    /// It is also possible to add one or more reviewers or CCs to a change simultaneously with a review.
+    /// Each element of the reviewers list is an instance of `ReviewerInput`.
+    /// The corresponding result of adding each reviewer will be returned in a map of inputs to `AddReviewerResults`.
+    fn set_review(
+        &mut self, change_id: &str, revision_id: &str, input: &ReviewInput,
+    ) -> Result<ReviewResult>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1826,6 +1855,20 @@ pub struct ReviewInput {
     /// If true, mark the change as work in progress.
     /// It is an error for both ready and work_in_progress to be true.
     pub work_in_progress: Option<bool>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReviewResult {
+    /// Map of labels to values after the review was posted.
+    /// `Null` if any reviewer additions were rejected.
+    pub labels: Option<BTreeMap<String, i32>>,
+    /// Map of account or group identifier to `AddReviewerResult` representing the outcome of adding as a reviewer.
+    /// Absent if no reviewer additions were requested.
+    pub reviewers: Option<BTreeMap<String, AddReviewerResult>>,
+    /// If true, the change was moved from WIP to ready for review as a result of this action.
+    #[serde(default)]
+    pub ready: bool,
 }
 
 /// The ReviewerInfo entity contains information about a reviewer and its votes on a change.

@@ -697,7 +697,7 @@ impl ChangeEndpoints for GerritRestApi {
             .rest
             .get(
                 format!(
-                    "/a/changes/{}/reviewers/{}/mergelist",
+                    "/a/changes/{}/revisions/{}/mergelist",
                     change_id, revision_id
                 )
                 .as_str(),
@@ -713,10 +713,35 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<BTreeMap<String, ActionInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/reviewers/{}/actions", change_id, revision_id).as_str())?
+            .get(format!("/a/changes/{}/revisions/{}/actions", change_id, revision_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let actions: BTreeMap<String, ActionInfo> = serde_json::from_str(&json)?;
         Ok(actions)
+    }
+
+    fn get_review(&mut self, change_id: &str, revision_id: &str) -> Result<ChangeInfo> {
+        let json = self
+            .rest
+            .get(format!("/a/changes/{}/revisions/{}/review", change_id, revision_id).as_str())?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let change: ChangeInfo = serde_json::from_str(&json)?;
+        Ok(change)
+    }
+
+    fn set_review(
+        &mut self, change_id: &str, revision_id: &str, input: &ReviewInput,
+    ) -> Result<ReviewResult> {
+        let json = self
+            .rest
+            .post_json(
+                format!("/a/changes/{}/revisions/{}/review", change_id, revision_id).as_str(),
+                input,
+            )?
+            .expect(StatusCode::OK)?
+            .json()?;
+        let result: ReviewResult = serde_json::from_str(&json)?;
+        Ok(result)
     }
 }
