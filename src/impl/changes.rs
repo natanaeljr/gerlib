@@ -8,6 +8,7 @@ use ::http::StatusCode;
 use serde_derive::Serialize;
 use serde_with::skip_serializing_none;
 use std::collections::BTreeMap;
+use url::quirks::pathname;
 
 /// Implement trait [ChangeEndpoints](trait.ChangeEndpoints.html) for Gerrit REST API.
 impl ChangeEndpoints for GerritRestApi {
@@ -780,5 +781,20 @@ impl ChangeEndpoints for GerritRestApi {
             .json()?;
         let submit: SubmitInfo = serde_json::from_str(&json)?;
         Ok(submit)
+    }
+
+    fn get_patch(
+        &mut self, change_id: &str, revision_id: &str, opts: &PatchParams,
+    ) -> Result<String> {
+        let params = serde_url_params::to_string(&opts)?;
+        let url = format!(
+            "/a/changes/{}/revisions/{}/patch{}{}",
+            change_id,
+            revision_id,
+            if params.is_empty() { "" } else { "?" },
+            params
+        );
+        let patch = self.rest.get(&url)?.expect(StatusCode::OK)?.string();
+        Ok(patch)
     }
 }

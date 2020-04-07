@@ -582,6 +582,22 @@ pub trait ChangeEndpoints {
     /// or the revision is not the current revision, the response is “409 Conflict” and the error message is
     /// contained in the response body.
     fn submit_revision(&mut self, change_id: &str, revision_id: &str) -> Result<SubmitInfo>;
+
+    /// Gets the formatted patch for one revision.
+    ///
+    /// The formatted patch is returned as text encoded inside base64.
+    ///
+    /// Adding query parameter `zip` (for example /changes/…​/patch?zip) returns the patch as a single file
+    /// inside of a ZIP archive. Clients can expand the ZIP to obtain the plain text patch, avoiding the need
+    /// for a base64 decoding step. This option implies `download`.
+    ///
+    /// Query parameter `download` (e.g. /changes/…​/patch?download) will suggest the browser save the patch as
+    /// `commitsha1.diff.base64`, for later processing by command line tools.
+    ///
+    /// If the path parameter is set, the returned content is a diff of the single file that the path refers to.
+    fn get_patch(
+        &mut self, change_id: &str, revision_id: &str, opts: &PatchParams,
+    ) -> Result<String>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2212,20 +2228,35 @@ pub struct WorkInProgressInput {
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Query parameters available for the change endpoint.
+#[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct QueryParams {
     /// Queries strings for searching changes.
-    #[serde(rename = "q", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "q")]
     pub search_queries: Option<Vec<QueryStr>>,
     /// Additional Options to extend the query results
-    #[serde(rename = "o", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "o")]
     pub additional_opts: Option<Vec<AdditionalOpt>>,
     /// Limit the returned results to no more than X records.
-    #[serde(rename = "n", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "n")]
     pub limit: Option<u32>,
     /// The start query parameter can be supplied to skip a number of changes from the list.
-    #[serde(rename = "S", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "S")]
     pub start: Option<u32>,
+}
+
+/// Patch query parameters available for the get patch endpoint.
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+pub struct PatchParams {
+    /// Returns the patch as a single file inside of a ZIP archive.
+    /// Clients can expand the ZIP to obtain the plain text patch, avoiding the need for a base64 decoding step.
+    /// This option implies `download`.
+    pub zip: Option<()>,
+    /// Suggest the browser save the patch as `commitsha1.diff.base64`
+    pub download: Option<()>,
+    /// If the `path` parameter is set, the returned content is a diff of the single file that the path refers to.
+    pub path: Option<String>,
 }
 
 /// Additional fields can be obtained by adding `o` parameters, each option requires more database
