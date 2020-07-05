@@ -103,25 +103,29 @@ impl Response {
     }
 }
 
-pub struct Message(String);
+pub struct Message(Vec<u8>);
 
 impl Message {
-    pub fn string(self) -> String {
+    pub fn raw(self) -> Vec<u8> {
         self.0
     }
 
+    pub fn string(self) -> String {
+        String::from_utf8_lossy(self.0.as_slice()).into()
+    }
+
     pub fn json(self) -> Result<String> {
-        const MAGIC_PREFIX: &'static str = ")]}'\n";
-        if !self.0.starts_with(MAGIC_PREFIX) {
-            return Err(Error::NotJsonResponse(self.0));
+        const MAGIC_PREFIX: &'static [u8] = b")]}'\n";
+        if !self.0.as_slice().starts_with(MAGIC_PREFIX) {
+            return Err(Error::NotJsonResponse(self.string()));
         }
-        let json = self.0[MAGIC_PREFIX.len()..].to_string();
+        let json = String::from_utf8_lossy(&self.0[MAGIC_PREFIX.len()..]).into_owned();
         Ok(json)
     }
 }
 
-impl From<String> for Message {
-    fn from(s: String) -> Self {
+impl From<Vec<u8>> for Message {
+    fn from(s: Vec<u8>) -> Self {
         Self(s)
     }
 }

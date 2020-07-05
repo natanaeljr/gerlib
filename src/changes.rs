@@ -597,7 +597,7 @@ pub trait ChangeEndpoints {
     /// If the path parameter is set, the returned content is a diff of the single file that the path refers to.
     fn get_patch(
         &mut self, change_id: &str, revision_id: &str, opts: &PatchParams,
-    ) -> Result<String>;
+    ) -> Result<Vec<u8>>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

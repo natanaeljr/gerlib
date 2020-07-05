@@ -84,25 +84,25 @@ impl HttpRequestHandler {
     }
 
     /// Perform a GET request.
-    pub fn get(&mut self, path_and_query: &str) -> Result<(u32, String)> {
+    pub fn get(&mut self, path_and_query: &str) -> Result<(u32, Vec<u8>)> {
         self.curl.get(true)?;
         self.perform_request(path_and_query, None)
     }
 
     /// Perform a PUT request.
-    pub fn put(&mut self, path_and_query: &str, tx_data: Option<&[u8]>) -> Result<(u32, String)> {
+    pub fn put(&mut self, path_and_query: &str, tx_data: Option<&[u8]>) -> Result<(u32, Vec<u8>)> {
         self.curl.put(true)?;
         self.perform_request(path_and_query, tx_data)
     }
 
     /// Perform a POST request.
-    pub fn post(&mut self, path_and_query: &str, tx_data: Option<&[u8]>) -> Result<(u32, String)> {
+    pub fn post(&mut self, path_and_query: &str, tx_data: Option<&[u8]>) -> Result<(u32, Vec<u8>)> {
         self.curl.post(true)?;
         self.perform_request(path_and_query, tx_data)
     }
 
     /// Perform a DELETE request.
-    pub fn delete(&mut self, path_and_query: &str) -> Result<(u32, String)> {
+    pub fn delete(&mut self, path_and_query: &str) -> Result<(u32, Vec<u8>)> {
         self.curl.custom_request("DELETE")?;
         self.perform_request(path_and_query, None)
     }
@@ -110,13 +110,12 @@ impl HttpRequestHandler {
     /// Perform a generic HTTP Request and return the code with received response body.
     fn perform_request(
         &mut self, path_and_query: &str, tx_data: Option<&[u8]>,
-    ) -> Result<(u32, String)> {
+    ) -> Result<(u32, Vec<u8>)> {
         let url = self.base_url.join(path_and_query)?;
         self.curl.url(url.as_str())?;
         let rx_data = self.perform_transfer(tx_data)?;
         let code = self.curl.response_code()?;
-        let response = String::from_utf8_lossy(rx_data.as_slice()).into_owned();
-        Ok((code, response))
+        Ok((code, rx_data))
     }
 
     /// Perform CURL transfer and return the response body.
