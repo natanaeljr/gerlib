@@ -93,10 +93,7 @@ impl Response {
 
     pub fn expect_or(self, expected_code: http::StatusCode) -> Result<Self> {
         if self.code.as_u16() != expected_code.as_u16() {
-            Err(Error::UnexpectedHttpResponse(
-                self.code,
-                self.message.string(),
-            ))
+            Err(Error::UnexpectedHttpResponse(self.code, self.message.raw()))
         } else {
             Ok(self)
         }
@@ -117,7 +114,7 @@ impl Message {
     pub fn json(self) -> Result<String> {
         const MAGIC_PREFIX: &'static [u8] = b")]}'\n";
         if !self.0.as_slice().starts_with(MAGIC_PREFIX) {
-            return Err(Error::NotJsonResponse(self.string()));
+            return Err(Error::NotJsonResponse(self.raw()));
         }
         let json = String::from_utf8_lossy(&self.0[MAGIC_PREFIX.len()..]).into_owned();
         Ok(json)

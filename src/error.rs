@@ -4,9 +4,9 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub enum Error {
     /// Unexpected HTTP response status code
-    UnexpectedHttpResponse(::http::StatusCode, String),
+    UnexpectedHttpResponse(::http::StatusCode, Vec<u8>),
     /// Response is not JSON
-    NotJsonResponse(String),
+    NotJsonResponse(Vec<u8>),
     /// Failed to deserialize JSON response
     InvalidJsonResponse(serde_json::Error),
     /// The HTTP handler returned error
