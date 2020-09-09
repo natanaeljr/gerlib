@@ -15,7 +15,7 @@ impl RestHandler {
     }
 
     pub fn get(&mut self, url: &str) -> Result<Response> {
-        self.http.headers(&[Header::AcceptAppJson])?;
+        self.http.headers(&[/*Header::AcceptAppJson*/])?;
         let (code, message) = self.http.get(url)?;
         Ok(Response {
             code: StatusCode::from_u16(code as u16).unwrap(),
@@ -36,7 +36,7 @@ impl RestHandler {
         T: Serialize + ?Sized,
     {
         self.http
-            .headers(&[Header::ContentTypeAppJson, Header::AcceptAppJson])?;
+            .headers(&[Header::ContentTypeAppJson /*, Header::AcceptAppJson*/])?;
         let data = serde_json::to_string(data)?;
         let (code, message) = self.http.put(url, Some(data.as_bytes()))?;
         Ok(Response {
@@ -50,7 +50,7 @@ impl RestHandler {
         T: Serialize + ?Sized,
     {
         self.http
-            .headers(&[Header::ContentTypeAppJson, Header::AcceptAppJson])?;
+            .headers(&[Header::ContentTypeAppJson /*, Header::AcceptAppJson*/])?;
         let data = serde_json::to_string(data)?;
         let (code, message) = self.http.post(url, Some(data.as_bytes()))?;
         Ok(Response {
@@ -68,7 +68,7 @@ impl RestHandler {
     }
 
     pub fn delete(&mut self, url: &str) -> Result<Response> {
-        self.http.headers(&[Header::AcceptAppJson])?;
+        self.http.headers(&[/*Header::AcceptAppJson*/])?;
         let (code, message) = self.http.delete(url)?;
         Ok(Response {
             code: StatusCode::from_u16(code as u16).unwrap(),

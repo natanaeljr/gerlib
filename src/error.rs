@@ -22,7 +22,7 @@ impl Display for Error {
                 write!(f, "Unexpected HTTP response code: {}", code)
             }
             Error::NotJsonResponse(_) => f.write_str("Unexpected non-JSON response"),
-            Error::InvalidJsonResponse(_) => f.write_str("Failed to parse JSON response"),
+            Error::InvalidJsonResponse(e) => write!(f, "Failed to parse JSON response:\n {}", e),
             Error::HttpHandler(_) => f.write_str("Low-level HTTP Handler failure"),
             Error::WrongQuery(_) => f.write_str("Failed to generate query"),
         }
