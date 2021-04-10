@@ -5,7 +5,7 @@
 use crate::accounts::{AccountInfo, AccountInput, GpgKeyInfo};
 use crate::details::Timestamp;
 use crate::Result;
-use serde::{Serialize, Serializer};
+use serde::{Serializer};
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::collections::{BTreeMap, HashMap};
@@ -2390,7 +2390,7 @@ pub enum Is {
     Wip,
 }
 
-impl Serialize for QueryStr {
+impl serde::Serialize for QueryStr {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
