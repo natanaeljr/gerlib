@@ -13,7 +13,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn create_change(&mut self, change: &ChangeInput) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json("/a/changes/", change)?
+            .post_json("a/changes/", change)?
             .expect(StatusCode::CREATED)?
             .json()?;
         let change_info = serde_json::from_str(&json)?;
@@ -23,7 +23,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn query_changes(&mut self, query: &QueryParams) -> Result<Vec<Vec<ChangeInfo>>> {
         let params = serde_url_params::to_string(query)?;
         let url = format!(
-            "/a/changes/{}{}",
+            "a/changes/{}{}",
             if params.is_empty() { "" } else { "?" },
             params
         );
@@ -48,7 +48,7 @@ impl ChangeEndpoints for GerritRestApi {
         };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/{}{}",
+            "a/changes/{}/{}{}",
             change_id,
             if params.is_empty() { "" } else { "?" },
             params
@@ -69,7 +69,7 @@ impl ChangeEndpoints for GerritRestApi {
         };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/detail/{}{}",
+            "a/changes/{}/detail/{}{}",
             change_id,
             if params.is_empty() { "" } else { "?" },
             params
@@ -84,7 +84,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json(format!("/a/changes/{}/merge", change_id).as_str(), input)?
+            .post_json(format!("a/changes/{}/merge", change_id).as_str(), input)?
             .expect(StatusCode::OK)?
             .json()?;
         let change = serde_json::from_str(&json)?;
@@ -96,7 +96,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .put_json(format!("/a/changes/{}/message", change_id).as_str(), input)?
+            .put_json(format!("a/changes/{}/message", change_id).as_str(), input)?
             .expect(StatusCode::OK)?
             .json()?;
         let change = serde_json::from_str(&json)?;
@@ -105,7 +105,7 @@ impl ChangeEndpoints for GerritRestApi {
 
     fn delete_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .delete(format!("/a/changes/{}", change_id).as_str())?
+            .delete(format!("a/changes/{}", change_id).as_str())?
             .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
@@ -113,7 +113,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_topic(&mut self, change_id: &str) -> Result<String> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/topic", change_id).as_str())?
+            .get(format!("a/changes/{}/topic", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let topic = serde_json::from_str(&json)?;
@@ -123,7 +123,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn set_topic(&mut self, change_id: &str, topic: &TopicInput) -> Result<String> {
         let json = self
             .rest
-            .put_json(format!("/a/changes/{}/topic", change_id).as_str(), topic)?
+            .put_json(format!("a/changes/{}/topic", change_id).as_str(), topic)?
             .expect(StatusCode::OK)?
             .json()?;
         let topic = serde_json::from_str(&json)?;
@@ -132,7 +132,7 @@ impl ChangeEndpoints for GerritRestApi {
 
     fn delete_topic(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .delete(format!("/a/changes/{}/topic", change_id).as_str())?
+            .delete(format!("a/changes/{}/topic", change_id).as_str())?
             .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
@@ -140,7 +140,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/assignee", change_id).as_str())?
+            .get(format!("a/changes/{}/assignee", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let assignee = serde_json::from_str(&json)?;
@@ -150,7 +150,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_past_assignees(&mut self, change_id: &str) -> Result<Vec<AccountInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/past_assignees", change_id).as_str())?
+            .get(format!("a/changes/{}/past_assignees", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let past_assignees = serde_json::from_str(&json)?;
@@ -161,7 +161,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .put_json(
-                format!("/a/changes/{}/assignee", change_id).as_str(),
+                format!("a/changes/{}/assignee", change_id).as_str(),
                 assignee,
             )?
             .expect(StatusCode::OK)?
@@ -173,7 +173,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn delete_assignee(&mut self, change_id: &str) -> Result<AccountInfo> {
         let json = self
             .rest
-            .delete(format!("/a/changes/{}/assignee", change_id).as_str())?
+            .delete(format!("a/changes/{}/assignee", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let assignee = serde_json::from_str(&json)?;
@@ -189,7 +189,7 @@ impl ChangeEndpoints for GerritRestApi {
         let query = Query { option: commit };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/pure_revert{}{}",
+            "a/changes/{}/pure_revert{}{}",
             change_id,
             if params.is_empty() { "" } else { "?" },
             params
@@ -203,7 +203,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/abandon", change_id).as_str(),
+                format!("a/changes/{}/abandon", change_id).as_str(),
                 abandon,
             )?
             .expect(StatusCode::OK)?
@@ -216,7 +216,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/restore", change_id).as_str(),
+                format!("a/changes/{}/restore", change_id).as_str(),
                 restore,
             )?
             .expect(StatusCode::OK)?
@@ -228,7 +228,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn rebase_change(&mut self, change_id: &str, rebase: &RebaseInput) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json(format!("/a/changes/{}/rebase", change_id).as_str(), rebase)?
+            .post_json(format!("a/changes/{}/rebase", change_id).as_str(), rebase)?
             .expect(StatusCode::OK)?
             .json()?;
         let change_info = serde_json::from_str(&json)?;
@@ -239,7 +239,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/move", change_id).as_str(),
+                format!("a/changes/{}/move", change_id).as_str(),
                 move_input,
             )?
             .expect(StatusCode::OK)?
@@ -251,7 +251,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn revert_change(&mut self, change_id: &str, revert: &RevertInput) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json(format!("/a/changes/{}/revert", change_id).as_str(), revert)?
+            .post_json(format!("a/changes/{}/revert", change_id).as_str(), revert)?
             .expect(StatusCode::OK)?
             .json()?;
         let change_info = serde_json::from_str(&json)?;
@@ -264,7 +264,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/revert_submission", change_id).as_str(),
+                format!("a/changes/{}/revert_submission", change_id).as_str(),
                 revert,
             )?
             .expect(StatusCode::OK)?
@@ -276,7 +276,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn submit_change(&mut self, change_id: &str, submit: &SubmitInput) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post_json(format!("/a/changes/{}/submit", change_id).as_str(), submit)?
+            .post_json(format!("a/changes/{}/submit", change_id).as_str(), submit)?
             .expect(StatusCode::OK)?
             .json()?;
         let change_info = serde_json::from_str(&json)?;
@@ -294,7 +294,7 @@ impl ChangeEndpoints for GerritRestApi {
         let query = Query { additional_opts };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/submitted_together?o=NON_VISIBLE_CHANGES{}{}",
+            "a/changes/{}/submitted_together?o=NON_VISIBLE_CHANGES{}{}",
             change_id,
             if params.is_empty() { "" } else { "&" },
             params
@@ -307,7 +307,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_included_in(&mut self, change_id: &str) -> Result<IncludedInInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/in", change_id).as_str())?
+            .get(format!("a/changes/{}/in", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let included_in = serde_json::from_str(&json)?;
@@ -316,7 +316,7 @@ impl ChangeEndpoints for GerritRestApi {
 
     fn index_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .post(format!("/a/changes/{}/index", change_id).as_str())?
+            .post(format!("a/changes/{}/index", change_id).as_str())?
             .expect(StatusCode::NO_CONTENT)?;
         Ok(())
     }
@@ -324,7 +324,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn list_change_comments(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/comments", change_id).as_str())?
+            .get(format!("a/changes/{}/comments", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let comments = serde_json::from_str(&json)?;
@@ -336,7 +336,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<BTreeMap<String, RobotCommentInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/robotcomments", change_id).as_str())?
+            .get(format!("a/changes/{}/robotcomments", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let robot_comments = serde_json::from_str(&json)?;
@@ -346,7 +346,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn list_change_drafts(&mut self, change_id: &str) -> Result<BTreeMap<String, CommentInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/drafts", change_id).as_str())?
+            .get(format!("a/changes/{}/drafts", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let drafts = serde_json::from_str(&json)?;
@@ -356,7 +356,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn check_change(&mut self, change_id: &str) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/check", change_id).as_str())?
+            .get(format!("a/changes/{}/check", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let changes = serde_json::from_str(&json)?;
@@ -366,7 +366,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn fix_change(&mut self, change_id: &str) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .post(format!("/a/changes/{}/check", change_id).as_str())?
+            .post(format!("a/changes/{}/check", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let changes = serde_json::from_str(&json)?;
@@ -376,7 +376,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn set_work_in_progress(
         &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
     ) -> Result<()> {
-        let url = format!("/a/changes/{}/wip", change_id);
+        let url = format!("a/changes/{}/wip", change_id);
         if let Some(input) = input {
             self.rest.post_json(&url, input)?
         } else {
@@ -389,7 +389,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn set_ready_for_review(
         &mut self, change_id: &str, input: Option<&WorkInProgressInput>,
     ) -> Result<()> {
-        let url = format!("/a/changes/{}/ready", change_id);
+        let url = format!("a/changes/{}/ready", change_id);
         if let Some(input) = input {
             self.rest.post_json(&url, input)?
         } else {
@@ -400,7 +400,7 @@ impl ChangeEndpoints for GerritRestApi {
     }
 
     fn mark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
-        let url = format!("/a/changes/{}/private", change_id);
+        let url = format!("a/changes/{}/private", change_id);
         if let Some(input) = input {
             self.rest.post_json(&url, input)?
         } else {
@@ -414,12 +414,12 @@ impl ChangeEndpoints for GerritRestApi {
     fn unmark_private(&mut self, change_id: &str, input: Option<&PrivateInput>) -> Result<()> {
         if let Some(input) = input {
             self.rest.post_json(
-                format!("/a/changes/{}/private.delete", change_id).as_str(),
+                format!("a/changes/{}/private.delete", change_id).as_str(),
                 input,
             )?
         } else {
             self.rest
-                .delete(format!("/a/changes/{}/private", change_id).as_str())?
+                .delete(format!("a/changes/{}/private", change_id).as_str())?
         }
         .expect(StatusCode::NO_CONTENT)?;
         Ok(())
@@ -427,28 +427,28 @@ impl ChangeEndpoints for GerritRestApi {
 
     fn ignore_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .put(format!("/a/changes/{}/ignore", change_id).as_str())?
+            .put(format!("a/changes/{}/ignore", change_id).as_str())?
             .expect(StatusCode::OK)?;
         Ok(())
     }
 
     fn unignore_change(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .put(format!("/a/changes/{}/unignore", change_id).as_str())?
+            .put(format!("a/changes/{}/unignore", change_id).as_str())?
             .expect(StatusCode::OK)?;
         Ok(())
     }
 
     fn mark_as_reviewed(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .put(format!("/a/changes/{}/reviewed", change_id).as_str())?
+            .put(format!("a/changes/{}/reviewed", change_id).as_str())?
             .expect(StatusCode::OK)?;
         Ok(())
     }
 
     fn mark_as_unreviewed(&mut self, change_id: &str) -> Result<()> {
         self.rest
-            .put(format!("/a/changes/{}/unreviewed", change_id).as_str())?
+            .put(format!("a/changes/{}/unreviewed", change_id).as_str())?
             .expect(StatusCode::OK)?;
         Ok(())
     }
@@ -456,7 +456,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_hashtags(&mut self, change_id: &str) -> Result<Vec<String>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/hashtags", change_id).as_str())?
+            .get(format!("a/changes/{}/hashtags", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let hashtags = serde_json::from_str(&json)?;
@@ -466,7 +466,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn set_hashtags(&mut self, change_id: &str, input: &HashtagsInput) -> Result<Vec<String>> {
         let json = self
             .rest
-            .post_json(format!("/a/changes/{}/hashtags", change_id).as_str(), input)?
+            .post_json(format!("a/changes/{}/hashtags", change_id).as_str(), input)?
             .expect(StatusCode::OK)?
             .json()?;
         let hashtags = serde_json::from_str(&json)?;
@@ -476,7 +476,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn list_change_messages(&mut self, change_id: &str) -> Result<Vec<ChangeMessageInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/messages", change_id).as_str())?
+            .get(format!("a/changes/{}/messages", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let messages = serde_json::from_str(&json)?;
@@ -488,7 +488,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<ChangeMessageInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/messages/{}", change_id, message_id).as_str())?
+            .get(format!("a/changes/{}/messages/{}", change_id, message_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let message = serde_json::from_str(&json)?;
@@ -501,14 +501,14 @@ impl ChangeEndpoints for GerritRestApi {
         let json = if let Some(input) = input {
             self.rest
                 .post_json(
-                    format!("/a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
+                    format!("a/changes/{}/messages/{}/delete", change_id, message_id).as_str(),
                     input,
                 )?
                 .expect(StatusCode::OK)?
                 .json()?
         } else {
             self.rest
-                .delete(format!("/a/changes/{}/messages/{}", change_id, message_id).as_str())?
+                .delete(format!("a/changes/{}/messages/{}", change_id, message_id).as_str())?
                 .expect(StatusCode::OK)?
                 .json()?
         };
@@ -519,7 +519,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn list_reviewers(&mut self, change_id: &str) -> Result<Vec<ReviewerInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/reviewers/", change_id).as_str())?
+            .get(format!("a/changes/{}/reviewers/", change_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let reviewers = serde_json::from_str(&json)?;
@@ -550,7 +550,7 @@ impl ChangeEndpoints for GerritRestApi {
         };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/suggest_reviewers{}{}",
+            "a/changes/{}/suggest_reviewers{}{}",
             change_id,
             if params.is_empty() { "" } else { "?" },
             params
@@ -563,7 +563,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_reviewer(&mut self, change_id: &str, account_id: &str) -> Result<ReviewerInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str())?
+            .get(format!("a/changes/{}/reviewers/{}", change_id, account_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let reviewer = serde_json::from_str(&json)?;
@@ -576,7 +576,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/reviewers/", change_id).as_str(),
+                format!("a/changes/{}/reviewers/", change_id).as_str(),
                 reviewer,
             )?
             .expect(StatusCode::OK)?
@@ -591,13 +591,13 @@ impl ChangeEndpoints for GerritRestApi {
         if let Some(input) = input {
             self.rest
                 .post_json(
-                    format!("/a/changes/{}/reviewers/{}/delete", change_id, account_id).as_str(),
+                    format!("a/changes/{}/reviewers/{}/delete", change_id, account_id).as_str(),
                     input,
                 )?
                 .expect(StatusCode::NO_CONTENT)?
         } else {
             self.rest
-                .delete(format!("/a/changes/{}/reviewers/{}", change_id, account_id).as_str())?
+                .delete(format!("a/changes/{}/reviewers/{}", change_id, account_id).as_str())?
                 .expect(StatusCode::NO_CONTENT)?
         };
         Ok(())
@@ -606,7 +606,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn list_votes(&mut self, change_id: &str, account_id: &str) -> Result<BTreeMap<String, i32>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/reviewers/{}/votes/", change_id, account_id).as_str())?
+            .get(format!("a/changes/{}/reviewers/{}/votes/", change_id, account_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let votes = serde_json::from_str(&json)?;
@@ -618,7 +618,7 @@ impl ChangeEndpoints for GerritRestApi {
         input: Option<&DeleteVoteInput>,
     ) -> Result<()> {
         let url = format!(
-            "/a/changes/{}/reviewers/{}/votes/{}",
+            "a/changes/{}/reviewers/{}/votes/{}",
             change_id, account_id, label_id
         );
         if let Some(input) = input {
@@ -644,7 +644,7 @@ impl ChangeEndpoints for GerritRestApi {
         };
         let params = serde_url_params::to_string(&query)?;
         let url = format!(
-            "/a/changes/{}/revisions/{}/commit{}{}",
+            "a/changes/{}/revisions/{}/commit{}{}",
             change_id,
             revision_id,
             if params.is_empty() { "" } else { "?" },
@@ -661,7 +661,7 @@ impl ChangeEndpoints for GerritRestApi {
             .rest
             .get(
                 format!(
-                    "/a/changes/{}/revisions/{}/description",
+                    "a/changes/{}/revisions/{}/description",
                     change_id, revision_id
                 )
                 .as_str(),
@@ -679,7 +679,7 @@ impl ChangeEndpoints for GerritRestApi {
             .rest
             .put_json(
                 format!(
-                    "/a/changes/{}/revisions/{}/description",
+                    "a/changes/{}/revisions/{}/description",
                     change_id, revision_id
                 )
                 .as_str(),
@@ -696,7 +696,7 @@ impl ChangeEndpoints for GerritRestApi {
             .rest
             .get(
                 format!(
-                    "/a/changes/{}/revisions/{}/mergelist",
+                    "a/changes/{}/revisions/{}/mergelist",
                     change_id, revision_id
                 )
                 .as_str(),
@@ -712,7 +712,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<BTreeMap<String, ActionInfo>> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/revisions/{}/actions", change_id, revision_id).as_str())?
+            .get(format!("a/changes/{}/revisions/{}/actions", change_id, revision_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let actions = serde_json::from_str(&json)?;
@@ -722,7 +722,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn get_review(&mut self, change_id: &str, revision_id: &str) -> Result<ChangeInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/revisions/{}/review", change_id, revision_id).as_str())?
+            .get(format!("a/changes/{}/revisions/{}/review", change_id, revision_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let change = serde_json::from_str(&json)?;
@@ -735,7 +735,7 @@ impl ChangeEndpoints for GerritRestApi {
         let json = self
             .rest
             .post_json(
-                format!("/a/changes/{}/revisions/{}/review", change_id, revision_id).as_str(),
+                format!("a/changes/{}/revisions/{}/review", change_id, revision_id).as_str(),
                 input,
             )?
             .expect(StatusCode::OK)?
@@ -749,7 +749,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<RelatedChangesInfo> {
         let json = self
             .rest
-            .get(format!("/a/changes/{}/revisions/{}/related", change_id, revision_id).as_str())?
+            .get(format!("a/changes/{}/revisions/{}/related", change_id, revision_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let related = serde_json::from_str(&json)?;
@@ -759,7 +759,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn rebase_revision(
         &mut self, change_id: &str, revision_id: &str, input: Option<&RebaseInput>,
     ) -> Result<ChangeInfo> {
-        let url = format!("/a/changes/{}/revisions/{}/rebase", change_id, revision_id);
+        let url = format!("a/changes/{}/revisions/{}/rebase", change_id, revision_id);
         let json = if let Some(input) = input {
             self.rest.post_json(&url, input)?
         } else {
@@ -774,7 +774,7 @@ impl ChangeEndpoints for GerritRestApi {
     fn submit_revision(&mut self, change_id: &str, revision_id: &str) -> Result<SubmitInfo> {
         let json = self
             .rest
-            .post(format!("/a/changes/{}/revisions/{}/submit", change_id, revision_id).as_str())?
+            .post(format!("a/changes/{}/revisions/{}/submit", change_id, revision_id).as_str())?
             .expect(StatusCode::OK)?
             .json()?;
         let submit = serde_json::from_str(&json)?;
@@ -786,7 +786,7 @@ impl ChangeEndpoints for GerritRestApi {
     ) -> Result<Vec<u8>> {
         let params = serde_url_params::to_string(&opts)?;
         let url = format!(
-            "/a/changes/{}/revisions/{}/patch{}{}",
+            "a/changes/{}/revisions/{}/patch{}{}",
             change_id,
             revision_id,
             if params.is_empty() { "" } else { "?" },
