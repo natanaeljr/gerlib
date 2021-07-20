@@ -777,9 +777,9 @@ pub struct ChangeInfo {
     /// Whether the change has been approved by the project submit rules. Only set if requested.
     pub submittable: Option<bool>,
     /// Number of inserted lines.
-    pub insertions: u32,
+    pub insertions: Option<u32>,
     /// Number of deleted lines.
-    pub deletions: u32,
+    pub deletions: Option<u32>,
     /// Total number of inline comments across all patch sets.
     /// Not set if the current change index doesn’t have the data.
     pub total_comment_count: Option<u32>,
@@ -1362,7 +1362,7 @@ pub struct FileInfo {
     /// from details provided in <<#diff-info,DiffInfo>>.
     pub lines_deleted: Option<u32>,
     /// Number of bytes by which the file size increased/decreased.
-    pub size_delta: i32,
+    pub size_delta: Option<i32>,
     /// File size in bytes.
     pub size: Option<u32>,
 }
@@ -1965,12 +1965,12 @@ pub struct RevisionInfo {
     /// The patch set number, or edit if the patch set is an edit.
     pub _number: u32,
     /// The timestamp of when the patch set was created.
-    pub created: Timestamp,
+    pub created: Option<Timestamp>,
     /// The uploader of the patch set as an AccountInfo entity.
-    pub uploader: AccountInfo,
+    pub uploader: Option<AccountInfo>,
     /// The Git reference for the patch set.
     #[serde(rename = "ref")]
-    pub refspec: String,
+    pub refspec: Option<String>,
     /// Information about how to fetch this patch set.
     /// The fetch information is provided as a map that maps the protocol name (“git”, “http”, “ssh”)
     /// to FetchInfo entities. This information is only included if a plugin implementing the
