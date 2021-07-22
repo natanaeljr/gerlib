@@ -596,7 +596,7 @@ pub trait ChangeEndpoints {
     ///
     /// If the path parameter is set, the returned content is a diff of the single file that the path refers to.
     fn get_patch(
-        &mut self, change_id: &str, revision_id: &str, opts: &PatchParams,
+        &mut self, change_id: &str, revision_id: &str, opts: &Option<PatchParams>,
     ) -> Result<Vec<u8>>;
 
     /// Gets a file containing thin bundles of all modified projects if this change was submitted.
@@ -615,6 +615,124 @@ pub trait ChangeEndpoints {
     fn submit_preview(
         &mut self, change_id: &str, revision_id: &str, format: CompressFormat,
     ) -> Result<Vec<u8>>;
+
+    /// Lists the draft comments of a revision that belong to the calling user.
+    ///
+    /// Returns a map of file paths to lists of CommentInfo entries. The entries in the map are sorted by file path.
+    fn list_drafts(
+        &mut self, change_id: &str, revision_id: &str,
+    ) -> Result<BTreeMap<String, CommentInfo>>;
+
+    /// Creates a draft comment on a revision.
+    ///
+    /// The new draft comment must be provided in the request body inside a CommentInput entity.
+    ///
+    /// As response a CommentInfo entity is returned that describes the draft comment.
+    fn create_draft(
+        &mut self, change_id: &str, revision_id: &str, input: &CommentInput,
+    ) -> Result<CommentInfo>;
+
+    /// Retrieves a draft comment of a revision that belongs to the calling user.
+    ///
+    /// As response a CommentInfo entity is returned that describes the draft comment.
+    fn get_draft(
+        &mut self, change_id: &str, revision_id: &str, draft_id: &str,
+    ) -> Result<CommentInfo>;
+
+    /// Updates a draft comment on a revision.
+    ///
+    /// The new draft comment must be provided in the request body inside a CommentInput entity.
+    ///
+    /// As response a CommentInfo entity is returned that describes the draft comment.
+    fn update_draft(
+        &mut self, change_id: &str, revision_id: &str, input: &CommentInput,
+    ) -> Result<CommentInfo>;
+
+    /// Deletes a draft comment from a revision.
+    fn delete_draft(
+        &mut self, change_id: &str, revision_id: &str, draft_id: &str,
+    ) -> Result<()>;
+
+    /// Lists the published comments of a revision.
+    ///
+    /// As result a map is returned that maps the file path to a list of CommentInfo entries.
+    /// The entries in the map are sorted by file path and only include file (or inline) comments.
+    /// Use the Get Change Detail endpoint to retrieve the general change message (or comment).
+    fn list_comments(
+        &mut self, change_id: &str, revision_id: &str,
+    ) -> Result<BTreeMap<String, Vec<CommentInfo>>>;
+
+    /// Retrieves a published comment of a revision.
+    ///
+    /// As response a CommentInfo entity is returned that describes the published comment.
+    fn get_comment(
+        &mut self, change_id: &str, revision_id: &str, comment_id: &str,
+    ) -> Result<CommentInfo>;
+
+    /// Deletes a published comment of a revision.
+    ///
+    /// Instead of deleting the whole comment, this endpoint just replaces the comment’s message with
+    /// a new message, which contains the name of the user who deletes the comment and the reason why it’s deleted.
+    ///
+    /// Note that only users with the Administrate Server global capability are permitted to delete a comment.
+    ///
+    /// Deletion reason can be provided in the request body as a DeleteCommentInput entity.
+    /// Historically, this method allowed a body in the DELETE, but that behavior is deprecated.
+    /// In this case, use a POST request instead:
+    fn delete_comment(
+        &mut self, change_id: &str, revision_id: &str, comment_id: &str,
+    ) -> Result<CommentInfo>;
+
+    /// Lists the files that were modified, added or deleted in a revision.
+    ///
+    /// As result a map is returned that maps the file path to a FileInfo entry.
+    /// The entries in the map are sorted by file path.
+    ///
+    /// The request parameter reviewed changes the response to return a list of the paths the caller has marked as reviewed.
+    /// Clients that also need the FileInfo should make two requests.
+    ///
+    /// The request parameter q changes the response to return a list of all files (modified or unmodified)
+    /// that contain that substring in the path name. This is useful to implement suggestion services finding
+    /// a file by partial name. Clients that also need the FileInfo should make two requests.
+    ///
+    /// For merge commits only, the integer-valued request parameter parent changes the response to return
+    /// a map of the files which are different in this commit compared to the given parent commit.
+    /// The value is the 1-based index of the parent’s position in the commit object, with the first
+    /// parent always belonging to the target branch. If not specified, the response contains a map of
+    /// the files different in the auto merge result.
+    ///
+    /// The request parameter base changes the response to return a map of the files which are different
+    /// in this commit compared to the given revision. The revision must correspond to a patch set in the change.
+    ///
+    /// The reviewed, q, parent, and base options are mutually exclusive. That is, only one of them may be used at a time.
+    fn list_files(
+        &mut self, change_id: &str, revision_id: &str, opts: &Option<ListFilesParams>
+    ) -> Result<BTreeMap<String, FileInfo>>;
+
+    /// Gets the content of a file from a certain revision.
+    ///
+    /// The optional, integer-valued parent parameter can be specified to request the named file from
+    /// a parent commit of the specified revision. The value is the 1-based index of the parent’s position
+    /// in the commit object. If the parameter is omitted or the value is non-positive, the patch set is referenced.
+    ///
+    /// The content is returned as base64 encoded string. The HTTP response Content-Type is always text/plain,
+    /// reflecting the base64 wrapping. A Gerrit-specific X-FYI-Content-Type header is returned describing the
+    /// server detected content type of the file.
+    ///
+    /// If only the content type is required, callers should use HEAD to avoid downloading the encoded file contents.
+    ///
+    /// Alternatively, if the only value of the Accept request header is application/json the content is returned as
+    /// JSON string and X-FYI-Content-Encoding is set to json.
+    fn get_content(
+        &mut self, change_id: &str, revision_id: &str, file_id: &str, opts: &Option<GetContentParams>,
+    ) -> Result<Vec<u8>>;
+
+    /// Gets the diff of a file from a certain revision.
+    ///
+    /// As response a DiffInfo entity is returned that describes the diff.
+    fn get_diff(
+        &mut self, change_id: &str, revision_id: &str, file_id: &str, opts: &Option<DiffParams>,
+    ) -> Result<DiffInfo>;
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2262,7 +2380,7 @@ pub struct QueryParams {
     pub start: Option<u32>,
 }
 
-/// Patch query parameters available for the get patch endpoint.
+/// Patch query parameters available for the get_patch endpoint.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct PatchParams {
@@ -2282,6 +2400,67 @@ pub enum CompressFormat {
     Zip,
     Tar,
     Tgz,
+}
+
+/// Diff query parameters available for the get_diff endpoint.
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+pub struct DiffParams {
+    /// If the intraline parameter is specified, intraline differences are included in the diff.
+    pub intraline: Option<()>,
+    /// The base parameter can be specified to control the base patch set from which the diff should be generated.
+    pub base: Option<u32>,
+    /// The integer-valued request parameter parent can be specified to control the parent commit number against
+    /// which the diff should be generated. This is useful for supporting review of merge commits.
+    /// The value is the 1-based index of the parent’s position in the commit object.
+    pub parent: Option<u32>,
+    /// The whitespace parameter can be specified to control how whitespace differences are reported in the diff result.
+    pub whitespace: DiffWhitespace,
+}
+
+/// The whitespace parameter can be specified to control how whitespace differences are reported in the diff result.
+#[derive(AsRefStr, Display, PartialEq, Eq, Clone, Debug, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
+pub enum DiffWhitespace {
+    IgnoreNone,
+    IgnoreTrailing,
+    IgnoreLeadingAndTrailing,
+    IgnoreAll,
+}
+
+/// ListFiles query parameters available for the list_files endpoint.
+///
+/// The reviewed, q, parent, and base options are mutually exclusive. That is, only one of them may be used at a time.
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+pub struct ListFilesParams {
+    /// The request parameter reviewed changes the response to return a list of the paths the caller has marked as reviewed.
+    /// Clients that also need the FileInfo should make two requests.
+    pub reviewed: Option<()>,
+    /// The request parameter q changes the response to return a list of all files (modified or unmodified) that
+    /// contain that substring in the path name. This is useful to implement suggestion services finding a file by partial name.
+    /// Clients that also need the FileInfo should make two requests.
+    pub q: Option<()>,
+    /// The request parameter base changes the response to return a map of the files which are different in this
+    /// commit compared to the given revision. The revision must correspond to a patch set in the change.
+    pub base: Option<u32>,
+    /// For merge commits only, the integer-valued request parameter parent changes the response to return a map of
+    /// the files which are different in this commit compared to the given parent commit.
+    /// The value is the 1-based index of the parent’s position in the commit object, with the first parent always
+    /// belonging to the target branch. If not specified, the response contains a map of the files different in the auto merge result.
+    pub parent: Option<u32>,
+}
+
+
+/// GetContent query parameters available for the get_content endpoint.
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+pub struct GetContentParams {
+    /// The optional, integer-valued parent parameter can be specified to request the named file from a
+    /// parent commit of the specified revision. The value is the 1-based index of the parent’s position in the commit object.
+    /// If the parameter is omitted or the value is non-positive, the patch set is referenced.
+    pub parent: Option<i32>,
 }
 
 /// Additional fields can be obtained by adding `o` parameters, each option requires more database
