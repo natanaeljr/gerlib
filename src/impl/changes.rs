@@ -795,4 +795,8 @@ impl ChangeEndpoints for GerritRestApi {
         let patch = self.rest.get(&url)?.expect(StatusCode::OK)?.raw();
         Ok(patch)
     }
+
+    fn submit_preview(&mut self, change_id: &str, revision_id: &str, format: CompressFormat) -> Result<Vec<u8>> {
+        todo!()
+    }
 }

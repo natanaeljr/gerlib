@@ -5,7 +5,7 @@
 use crate::accounts::{AccountInfo, AccountInput, GpgKeyInfo};
 use crate::details::Timestamp;
 use crate::Result;
-use serde::{Serializer};
+use serde::Serializer;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::collections::{BTreeMap, HashMap};
@@ -491,7 +491,7 @@ pub trait ChangeEndpoints {
     /// Adding query parameter links (for example /changes/…​/commit?links) returns a `CommitInfo` with
     /// the additional field web_links.
     fn get_commit(&mut self, change_id: &str, revision_id: &str, links: bool)
-        -> Result<CommitInfo>;
+                  -> Result<CommitInfo>;
 
     /// Retrieves the description of a patch set.
     ///
@@ -597,6 +597,23 @@ pub trait ChangeEndpoints {
     /// If the path parameter is set, the returned content is a diff of the single file that the path refers to.
     fn get_patch(
         &mut self, change_id: &str, revision_id: &str, opts: &PatchParams,
+    ) -> Result<Vec<u8>>;
+
+    /// Gets a file containing thin bundles of all modified projects if this change was submitted.
+    ///
+    /// The bundles are named ${ProjectName}.git. Each thin bundle contains enough to construct the state
+    /// in which a project would be in if this change were submitted.
+    /// The base of the thin bundles are the current target branches, so to make use of this call in
+    /// a non-racy way, first get the bundles and then fetch all projects contained in the bundle.
+    /// (This assumes no non-fastforward pushes).
+    ///
+    /// You need to give a parameter '?format=zip' or '?format=tar' to specify the format for the outer container.
+    /// It is always possible to use tgz, even if tgz is not in the list of allowed archive formats.
+    ///
+    /// To make good use of this call, you would roughly need code as found at:
+    ///  $ curl -Lo preview_submit_test.sh http://review.example.com:8080/tools/scripts/preview_submit_test.sh
+    fn submit_preview(
+        &mut self, change_id: &str, revision_id: &str, format: CompressFormat,
     ) -> Result<Vec<u8>>;
 }
 
@@ -2259,6 +2276,14 @@ pub struct PatchParams {
     pub path: Option<String>,
 }
 
+/// Compression Formats
+#[derive(Debug, Display, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub enum CompressFormat {
+    Zip,
+    Tar,
+    Tgz,
+}
+
 /// Additional fields can be obtained by adding `o` parameters, each option requires more database
 /// lookups and slows down the query response time to the client so they are generally disabled by default.
 #[derive(AsRefStr, Display, PartialEq, Eq, Clone, Debug, Serialize)]
@@ -2392,8 +2417,8 @@ pub enum Is {
 
 impl serde::Serialize for QueryStr {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         match self {
             QueryStr::Raw(s) => serializer.serialize_str(s.as_str()),
