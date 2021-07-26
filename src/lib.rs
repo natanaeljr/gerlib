@@ -26,28 +26,28 @@ pub type Result<T> = std::result::Result<T, crate::error::Error>;
 ///
 /// The API is suitable for automated tools to build upon, as well as supporting some ad-hoc scripting use cases.
 pub struct GerritRestApi {
-    rest: RestHandler,
+  rest: RestHandler,
 }
 
 impl GerritRestApi {
-    /// Create a new GerritRestApi with the host url, username and HTTP password.
-    ///
-    /// Additional configuration is available through specific methods below.
-    pub fn new(base_url: Url, username: &str, password: &str) -> Result<Self> {
-        let http = HttpRequestHandler::new(base_url, username, password)?;
-        let rest = RestHandler::new(http);
-        Ok(Self { rest })
-    }
+  /// Create a new GerritRestApi with the host url, username and HTTP password.
+  ///
+  /// Additional configuration is available through specific methods below.
+  pub fn new(base_url: Url, username: &str, password: &str) -> Result<Self> {
+    let http = HttpRequestHandler::new(base_url, username, password)?;
+    let rest = RestHandler::new(http);
+    Ok(Self { rest })
+  }
 
-    /// Specify the HTTP authentication method.
-    pub fn http_auth(mut self, auth: &HttpAuthMethod) -> Result<Self> {
-        self.rest = RestHandler::new(self.rest.http().http_auth(auth)?);
-        Ok(self)
-    }
+  /// Specify the HTTP authentication method.
+  pub fn http_auth(mut self, auth: &HttpAuthMethod) -> Result<Self> {
+    self.rest = RestHandler::new(self.rest.http().http_auth(auth)?);
+    Ok(self)
+  }
 
-    /// Enable/Disable SSL verification of both host and peer.
-    pub fn ssl_verify(mut self, enable: bool) -> Result<Self> {
-        self.rest = RestHandler::new(self.rest.http().ssl_verify(enable)?);
-        Ok(self)
-    }
+  /// Enable/Disable SSL verification of both host and peer.
+  pub fn ssl_verify(mut self, enable: bool) -> Result<Self> {
+    self.rest = RestHandler::new(self.rest.http().ssl_verify(enable)?);
+    Ok(self)
+  }
 }
