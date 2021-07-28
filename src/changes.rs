@@ -1021,6 +1021,7 @@ pub struct ChangeMessageInfo {
 pub enum ChangeStatus {
   New,
   Merged,
+  Submitted,
   Abandoned,
   Draft,
 }
