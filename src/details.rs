@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Timestamp(#[serde(with = "super::details::serde_timestamp")] pub DateTime<Utc>);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

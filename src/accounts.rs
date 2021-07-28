@@ -18,7 +18,7 @@ pub trait AccountEndpoints {}
 
 /// The AccountInfo entity contains information about an account.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccountInfo {
   /// The numeric ID of the account.
   #[serde(rename = "_account_id")]
@@ -55,7 +55,7 @@ pub struct AccountInfo {
 
 /// The AccountInput entity contains information for the creation of a new account.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccountInput {
   /// The user name. If provided, must match the user name from the URL.
   pub username: Option<String>,
@@ -75,7 +75,7 @@ pub struct AccountInput {
 
 /// The AccountInfo entity contains information about an avatar image of an account.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AvatarInfo {
   /// The URL to the avatar image.
   pub url: String,
@@ -87,7 +87,7 @@ pub struct AvatarInfo {
 
 /// The GpgKeyInfo entity contains information about a GPG public key.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GpgKeyInfo {
   /// The 8-char hex GPG key ID.
   /// Not set in map context

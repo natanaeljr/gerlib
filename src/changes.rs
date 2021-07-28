@@ -686,7 +686,7 @@ pub trait ChangeEndpoints {
 
 /// The AbandonInput entity contains information for abandoning a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AbandonInput {
   /// Message to be added as review comment to the change when abandoning the change.
   pub message: Option<String>,
@@ -702,7 +702,7 @@ pub struct AbandonInput {
 /// The ActionInfo entity describes a REST API call the client can make to manipulate a resource.
 /// These are frequently implemented by plugins and may be discovered at runtime.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActionInfo {
   /// HTTP method to use with the action.
   /// Most actions use POST, PUT or DELETE to cause state changes.
@@ -721,7 +721,7 @@ pub struct ActionInfo {
 
 /// The AddReviewerResult entity describes the result of adding a reviewer to a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AddReviewerResult {
   /// Value of the reviewer field from ReviewerInput set while adding the reviewer.
   pub input: String,
@@ -742,7 +742,7 @@ pub struct AddReviewerResult {
 /// The ApprovalInfo entity contains information about an approval from a user for a label on a change.
 /// ApprovalInfo has the same fields as AccountInfo. In addition to the following fields:
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApprovalInfo {
   /// The account information entity.
   #[serde(flatten)]
@@ -766,14 +766,14 @@ pub struct ApprovalInfo {
 }
 
 /// The AssigneeInput entity contains the identity of the user to be set as assignee.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssigneeInput {
   /// The ID of one account that should be added as assignee.
   pub assignee: String,
 }
 
 /// The BlameInfo entity stores the commit metadata with the row coordinates where it applies.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlameInfo {
   /// The author of the commit.
   pub author: String,
@@ -789,7 +789,7 @@ pub struct BlameInfo {
 
 /// The ChangeEditInput entity contains information for restoring a path within change edit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeEditInput {
   /// Path to file to restore.
   pub restore_path: Option<String>,
@@ -801,7 +801,7 @@ pub struct ChangeEditInput {
 
 /// The ChangeEditMessageInput entity contains information for changing the commit message
 /// within a change edit.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeEditMessageInput {
   /// New commit message.
   pub message: String,
@@ -809,7 +809,7 @@ pub struct ChangeEditMessageInput {
 
 /// The ChangeInfo entity contains information about a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeInfo {
   /// The ID of the change in the format "'<project>~<branch>~<Change-Id>'",
   /// where 'project', 'branch' and 'Change-Id' are URL encoded.
@@ -932,7 +932,7 @@ pub struct ChangeInfo {
 
 /// The ChangeInput entity contains information about creating a new change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeInput {
   /// The name of the project.
   pub project: String,
@@ -978,7 +978,7 @@ pub struct ChangeInput {
 }
 
 /// Change kind.
-#[derive(Debug, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Display, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ChangeKind {
@@ -991,7 +991,7 @@ pub enum ChangeKind {
 
 /// The ChangeMessageInfo entity contains information about a message attached to a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeMessageInfo {
   /// The ID of the message.
   pub id: String,
@@ -1026,7 +1026,7 @@ pub enum ChangeStatus {
 }
 
 /// The type of change.
-#[derive(Debug, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Display, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ChangeType {
@@ -1040,7 +1040,7 @@ pub enum ChangeType {
 
 /// The CherryPickInput entity contains information for cherry-picking a change to a new branch.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CherryPickInput {
   /// Commit message for the cherry-pick change. If not set, the commit message of the
   /// cherry-picked commit is used.
@@ -1070,7 +1070,7 @@ pub struct CherryPickInput {
 
 /// The CommentInfo entity contains information about an inline comment.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommentInfo {
   /// The patch set number for the comment; only set in contexts where
   /// comments may be returned for multiple patch sets.
@@ -1111,7 +1111,7 @@ pub struct CommentInfo {
 
 /// The CommentInput entity contains information for creating an inline comment.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommentInput {
   /// The URL encoded UUID of the comment if an existing draft comment should be updated.
   pub id: Option<String>,
@@ -1153,7 +1153,7 @@ pub struct CommentInput {
 /// So, a range over part of a line will have start_line equal to end_line;
 /// however a range with end_line set to 5 and end_character equal to 0 will not include any
 /// characters on line 5,
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommentRange {
   /// The start line number of the range. (1-based)
   pub start_line: u32,
@@ -1167,7 +1167,7 @@ pub struct CommentRange {
 
 /// The CommitInfo entity contains information about a commit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommitInfo {
   /// The commit ID. Not set if included in a RevisionInfo entity that is contained in a map
   /// which has the commit ID as key.
@@ -1189,7 +1189,7 @@ pub struct CommitInfo {
 
 /// The CommitMessageInput entity contains information for changing the commit message of a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommitMessageInput {
   pub message: String,
   /// Notify handling that defines to whom email notifications should be sent after
@@ -1212,7 +1212,7 @@ pub enum CommentSide {
 
 /// The DeleteChangeMessageInput entity contains the options for deleting a change message.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeleteChangeMessageInput {
   /// The reason why the change message should be deleted.
   /// If set, the change message will be replaced with:
@@ -1222,7 +1222,7 @@ pub struct DeleteChangeMessageInput {
 
 /// The DeleteCommentInput entity contains the option for deleting a comment.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeleteCommentInput {
   /// The reason why the comment should be deleted.
   /// If set, the comment’s message will be replaced with:
@@ -1232,7 +1232,7 @@ pub struct DeleteCommentInput {
 
 /// The DeleteReviewerInput entity contains options for the deletion of a reviewer.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeleteReviewerInput {
   /// Notify handling that defines to whom email notifications should be sent
   /// after the reviewer is deleted.
@@ -1245,7 +1245,7 @@ pub struct DeleteReviewerInput {
 
 /// The DeleteVoteInput entity contains options for the deletion of a vote.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeleteVoteInput {
   /// The label for which the vote should be deleted.
   /// If set, must match the label in the URL.
@@ -1260,7 +1260,7 @@ pub struct DeleteVoteInput {
 }
 
 /// The DescriptionInput entity contains information for setting a description.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DescriptionInput {
   /// The description text.
   pub description: String,
@@ -1268,7 +1268,7 @@ pub struct DescriptionInput {
 
 /// The DiffContent entity contains information about the content differences in a file.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffContent {
   /// Content only in the file on side A (deleted in B).
   pub a: Option<String>,
@@ -1296,7 +1296,7 @@ pub struct DiffContent {
 
 /// The DiffFileMetaInfo entity contains meta information about a file diff.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffFileMetaInfo {
   /// The name of the file.
   pub name: String,
@@ -1311,7 +1311,7 @@ pub struct DiffFileMetaInfo {
 /// The DiffInfo entity contains information about the diff of a file in a revision.
 /// If the weblinks-only parameter is specified, only the web_links field is set.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffInfo {
   /// Meta information about the file on side A as a DiffFileMetaInfo entity.
   /// Not present when the file is added.
@@ -1345,14 +1345,14 @@ pub struct DiffInfo {
 ///
 /// Note that the implied newline character at the end of each line is included in the
 /// length calculation,and thus it is possible for the edits to span newlines.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffIntralineInfo {
   #[serde(flatten)]
   pub values: Vec<String>,
 }
 
 /// The DiffWebLinkInfo entity describes a link on a diff screen to an external site.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffWebLinkInfo {
   /// The link name.
   pub name: String,
@@ -1378,7 +1378,7 @@ pub enum DraftHandling {
 
 /// The EditFileInfo entity contains additional information of a file within a change edit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EditFileInfo {
   /// Links to the diff info in external sites as a list of WebLinkInfo entities.
   pub wbe_links: Option<Vec<WebLinkInfo>>,
@@ -1386,7 +1386,7 @@ pub struct EditFileInfo {
 
 /// The EditInfo entity contains information about a change edit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EditInfo {
   /// The commit of change edit as CommitInfo entity.
   pub commit: CommitInfo,
@@ -1407,7 +1407,7 @@ pub struct EditInfo {
 
 /// The FetchInfo entity contains information about how to fetch a patch set via a certain protocol.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FetchInfo {
   pub url: String,
   /// The ref of the patch set.
@@ -1420,7 +1420,7 @@ pub struct FetchInfo {
 
 /// The FileInfo entity contains information about a file in a patch set.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileInfo {
   /// The status of the file
   #[serde(default)]
@@ -1473,7 +1473,7 @@ impl Default for FileStatus {
 
 /// The FixInput entity contains options for fixing commits using the fix change endpoint.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FixInput {
   /// If true, delete patch sets from the database if they refer to missing commit options.
   pub delete_patch_set_if_commit_missing: bool,
@@ -1484,7 +1484,7 @@ pub struct FixInput {
 
 /// The FixSuggestionInfo entity represents a suggested fix.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FixSuggestionInfo {
   /// The UUID of the suggested fix.
   /// It will be generated automatically and hence will be ignored if it’s set for input objects.
@@ -1497,7 +1497,7 @@ pub struct FixSuggestionInfo {
 }
 
 /// The FixReplacementInfo entity describes how the content of a file should be replaced by another content.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FixReplacementInfo {
   /// The path of the file which should be modified. Any file in the repository may be modified.
   pub path: String,
@@ -1511,7 +1511,7 @@ pub struct FixReplacementInfo {
 }
 
 /// The GitPersonInfo entity contains information about the author/committer of a commit.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GitPersonInfo {
   /// The name of the author/committer.
   pub name: String,
@@ -1524,7 +1524,7 @@ pub struct GitPersonInfo {
 }
 
 /// The GroupBaseInfo entity contains base information about the group.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GroupBaseInfo {
   /// The UUID of the group.
   pub id: String,
@@ -1534,7 +1534,7 @@ pub struct GroupBaseInfo {
 
 /// The HashtagsInput entity contains information about hashtags to add to, and/or remove from, a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HashtagsInput {
   /// The list of hashtags to be added to the change.
   pub add: Option<Vec<String>>,
@@ -1554,7 +1554,7 @@ pub enum HttpMethod {
 
 /// The IncludedInInfo entity contains information about the branches a change was merged into and tags it was tagged with.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncludedInInfo {
   /// The list of branches this change was merged into. Each branch is listed without the 'refs/head/' prefix.
   pub branches: Vec<String>,
@@ -1582,7 +1582,7 @@ pub enum IntralineStatus {
 ///  - For detailed information about labels, including exact numeric votes for all users and the
 ///    allowed range of votes for the current user, use DETAILED_LABELS.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LabelInfo {
   /// Whether the label is optional. Optional means the label may be set,
   /// but it’s neither necessary for submission nor does it block submission if set.
@@ -1618,7 +1618,7 @@ pub struct LabelInfo {
 
 /// The MergeableInfo entity contains information about the mergeability of a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MergeableInfo {
   /// Submit type used for this change.
   pub submit_type: SubmitType,
@@ -1638,7 +1638,7 @@ pub struct MergeableInfo {
 
 /// The MergeInput entity contains information about the merge.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MergeInput {
   /// The source to merge from, e.g. a complete or abbreviated commit SHA-1,a complete reference
   /// name, a short reference name under refs/heads, refs/tags, or refs/remotes namespace, etc.
@@ -1661,7 +1661,7 @@ pub struct MergeInput {
 /// The MergePatchSetInput entity contains information about updating a new change by creating
 /// a new merge commit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MergePatchSetInput {
   /// The new subject for the change, if not specified, will reuse the current patch set’s subject
   pub subject: Option<String>,
@@ -1690,7 +1690,7 @@ pub enum MergeStrategy {
 
 /// The MoveInput entity contains information for moving a change to a new branch.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MoveInput {
   /// Destination branch.
   pub destination_branch: String,
@@ -1714,7 +1714,7 @@ pub enum NotifyHandling {
 /// normal notifications. NotifyInfo entities are normally contained in a notify_details map in the
 /// request input where the key is the recipient type.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NotifyInfo {
   /// A list of account IDs that identify the accounts that should be should be notified.
   pub accounts: Option<Vec<String>>,
@@ -1722,7 +1722,7 @@ pub struct NotifyInfo {
 
 /// The PrivateInput entity contains information for changing the private flag on a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PrivateInput {
   /// Message describing why the private flag was changed.
   pub message: Option<String>,
@@ -1732,7 +1732,7 @@ pub struct PrivateInput {
 /// These are not related to the code review process, but rather indicate some inconsistency in
 /// Gerrit’s database or repository metadata related to the enclosing change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProblemInfo {
   /// Plaintext message describing the problem with the change.
   pub message: String,
@@ -1753,7 +1753,7 @@ pub enum ProblemStatus {
 
 /// The PublishChangeEditInput entity contains options for the publishing of change edit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PublishChangeEditInput {
   /// Notify handling that defines to whom email notifications should be sent
   /// after the change edit is published.
@@ -1765,7 +1765,7 @@ pub struct PublishChangeEditInput {
 }
 
 /// The PureRevertInfo entity describes the result of a pure revert check.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PureRevertInfo {
   /// Outcome of the check as boolean.
   pub is_pure_revert: bool,
@@ -1774,7 +1774,7 @@ pub struct PureRevertInfo {
 /// The PushCertificateInfo entity contains information about a push certificate provided when
 /// the user pushed for review with git push --signed HEAD:refs/for/<branch>.
 /// Only used when signed push is enabled on the server.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PushCertificateInfo {
   /// Signed certificate payload and GPG signature block.
   pub certificate: String,
@@ -1784,7 +1784,7 @@ pub struct PushCertificateInfo {
 }
 
 /// The RangeInfo entity stores the coordinates of a range.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RangeInfo {
   /// First index.
   pub start: u32,
@@ -1794,7 +1794,7 @@ pub struct RangeInfo {
 
 /// The RebaseInput entity contains information for changing parent when rebasing.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RebaseInput {
   /// The new parent revision. This can be a ref or a SHA1 to a concrete patchset.
   /// Alternatively, a change number can be specified, in which case the current patch set is inferred.
@@ -1815,7 +1815,7 @@ pub enum RecipientType {
 
 /// The RelatedChangeAndCommitInfo entity contains information about a related change and commit.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RelatedChangeAndCommitInfo {
   /// The project of the change or commit.
   pub project: String,
@@ -1837,7 +1837,7 @@ pub struct RelatedChangeAndCommitInfo {
 }
 
 /// The RelatedChangesInfo entity contains information about related changes.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RelatedChangesInfo {
   /// A list of RelatedChangeAndCommitInfo entities describing the related changes.
   /// Sorted by git commit order, newest to oldest. Empty if there are no related changes.
@@ -1846,7 +1846,7 @@ pub struct RelatedChangesInfo {
 
 /// The Requirement entity contains information about a requirement relative to a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Requirement {
   /// Status of the requirement.
   pub status: RequirementStatus,
@@ -1874,7 +1874,7 @@ pub enum RequirementStatus {
 
 /// The RestoreInput entity contains information for restoring a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RestoreInput {
   /// Message to be added as review comment to the change when restoring the change.
   pub message: Option<String>,
@@ -1882,7 +1882,7 @@ pub struct RestoreInput {
 
 /// The RevertInput entity contains information for reverting a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RevertInput {
   /// Message to be added as review comment to the change when reverting the change.
   pub message: Option<String>,
@@ -1900,7 +1900,7 @@ pub struct RevertInput {
 }
 
 /// The RevertSubmissionInfo entity describes the revert changes.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RevertSubmissionInfo {
   /// A list of ChangeInfo that describes the revert changes.
   /// Each entity in that list is a revert change that was created in that revert submission.
@@ -1908,7 +1908,7 @@ pub struct RevertSubmissionInfo {
 }
 
 /// The ReviewInfo entity contains information about a review.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewInfo {
   /// The labels of the review as a map that maps the label names to the voting values.
   pub labels: BTreeMap<String, i32>,
@@ -1928,7 +1928,7 @@ pub enum ReviewerState {
 }
 
 /// The ReviewerUpdateInfo entity contains information about updates to change’s reviewers set.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewerUpdateInfo {
   /// Timestamp of the update.
   pub updated: Timestamp,
@@ -1942,7 +1942,7 @@ pub struct ReviewerUpdateInfo {
 
 /// The ReviewInput entity contains information for adding a review to a revision.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewInput {
   /// The message to be added as review comment.
   pub message: Option<String>,
@@ -1985,7 +1985,7 @@ pub struct ReviewInput {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewResult {
   /// Map of labels to values after the review was posted.
   /// `Null` if any reviewer additions were rejected.
@@ -2001,7 +2001,7 @@ pub struct ReviewResult {
 /// The ReviewerInfo entity contains information about a reviewer and its votes on a change.
 /// ReviewerInfo has the same fields as AccountInfo and includes detailed account information.
 /// In addition ReviewerInfo has the following fields:
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewerInfo {
   /// The account information entity.
   #[serde(flatten)]
@@ -2013,7 +2013,7 @@ pub struct ReviewerInfo {
 
 /// The ReviewerInput entity contains information for adding a reviewer to a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewerInput {
   /// The ID of one account that should be added as reviewer or the ID of one internal group for
   /// which all members should be added as reviewers.
@@ -2038,7 +2038,7 @@ pub struct ReviewerInput {
 
 /// The ReviewerInput entity contains information for adding a reviewer to a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RevisionInfo {
   /// The change kind.
   pub kind: Option<ChangeKind>,
@@ -2084,7 +2084,7 @@ pub struct RevisionInfo {
 /// The RobotCommentInfo entity contains information about a robot inline comment.
 /// RobotCommentInfo has the same fields as CommentInfo. In addition RobotCommentInfo has the following fields:
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RobotCommentInfo {
   /// The comment information entity.
   #[serde(flatten)]
@@ -2103,7 +2103,7 @@ pub struct RobotCommentInfo {
 
 /// The RobotCommentInput entity contains information for creating an inline robot comment.
 /// RobotCommentInput has the same fields as RobotCommentInfo.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RobotCommentInput {
   /// The robot comment information entity.
   #[serde(flatten)]
@@ -2112,7 +2112,7 @@ pub struct RobotCommentInput {
 
 /// The RuleInput entity contains information to test a Prolog rule.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RuleInput {
   /// Prolog code to execute instead of the code in refs/meta/config.
   pub rule: String,
@@ -2134,7 +2134,7 @@ pub enum RuleFilter {
 
 /// The SubmitInfo entity contains information about the change status after submitting.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubmitInfo {
   /// The status of the change after submitting is MERGED.
   pub status: ChangeStatus,
@@ -2149,7 +2149,7 @@ pub struct SubmitInfo {
 
 /// The SubmitInput entity contains information for submitting a change.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubmitInput {
   /// If set, submit the change on behalf of the given user.
   /// The value may take any format accepted by the accounts REST API.
@@ -2167,7 +2167,7 @@ pub struct SubmitInput {
 /// The SubmitRecord entity describes results from a submit_rule.
 /// Fields in this entity roughly correspond to the fields set by LABELS in LabelInfo.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubmitRecord {
   /// The submit status.
   pub status: SubmitStatus,
@@ -2186,7 +2186,7 @@ pub struct SubmitRecord {
 }
 
 /// Submit type.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum SubmitType {
   Inherit,
@@ -2213,7 +2213,7 @@ impl std::fmt::Display for SubmitType {
 }
 
 /// The SubmittedTogetherInfo entity contains information about a collection of changes that would be submitted together.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubmittedTogetherInfo {
   /// A list of ChangeInfo entities representing the changes to be submitted together.
   pub changes: Vec<ChangeInfo>,
@@ -2243,7 +2243,7 @@ pub enum SubmitStatus {
 /// SuggestedReviewerInfo has either the account field that contains the AccountInfo entity,
 /// or the group field that contains the GroupBaseInfo entity.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SuggestedReviewerInfo {
   /// An AccountInfo entity, if the suggestion is an account.
   pub account: Option<AccountInfo>,
@@ -2259,14 +2259,14 @@ pub struct SuggestedReviewerInfo {
 }
 
 /// The TopicInput entity contains information for setting a topic.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopicInput {
   /// The topic.
   pub topic: String,
 }
 
 /// The TrackingIdInfo entity describes a reference to an external tracking system.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrackingIdInfo {
   /// The name of the external tracking system.
   pub system: String,
@@ -2275,7 +2275,7 @@ pub struct TrackingIdInfo {
 }
 
 /// The VotingRangeInfo entity describes the continuous voting range from min to max values.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotingRangeInfo {
   /// The minimum voting value.
   pub min: i32,
@@ -2285,7 +2285,7 @@ pub struct VotingRangeInfo {
 
 /// The WebLinkInfo entity describes a link to an external site.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebLinkInfo {
   /// The link name.
   pub name: String,
@@ -2297,7 +2297,7 @@ pub struct WebLinkInfo {
 
 /// The WorkInProgressInput entity contains additional information for a change set to WorkInProgress/ReadyForReview.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkInProgressInput {
   /// Message to be added as a review comment to the change being set WorkInProgress/ReadyForReview.
   pub message: Option<String>,
@@ -2309,7 +2309,7 @@ pub struct WorkInProgressInput {
 
 /// Query parameters available for the change endpoint.
 #[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct QueryParams {
   /// Queries strings for searching changes.
   #[serde(rename = "q")]
@@ -2327,7 +2327,7 @@ pub struct QueryParams {
 
 /// Patch query parameters available for the get_patch endpoint.
 #[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct PatchParams {
   /// Returns the patch as a single file inside of a ZIP archive.
   /// Clients can expand the ZIP to obtain the plain text patch, avoiding the need for a base64 decoding step.
@@ -2349,7 +2349,7 @@ pub enum CompressFormat {
 
 /// Diff query parameters available for the get_diff endpoint.
 #[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct DiffParams {
   /// If the intraline parameter is specified, intraline differences are included in the diff.
   pub intraline: Option<()>,
@@ -2378,7 +2378,7 @@ pub enum DiffWhitespace {
 ///
 /// The reviewed, q, parent, and base options are mutually exclusive. That is, only one of them may be used at a time.
 #[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct ListFilesParams {
   /// The request parameter reviewed changes the response to return a list of the paths the caller has marked as reviewed.
   /// Clients that also need the FileInfo should make two requests.
@@ -2399,7 +2399,7 @@ pub struct ListFilesParams {
 
 /// GetContent query parameters available for the get_content endpoint.
 #[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct GetContentParams {
   /// The optional, integer-valued parent parameter can be specified to request the named file from a
   /// parent commit of the specified revision. The value is the 1-based index of the parent’s position in the commit object.
@@ -2475,20 +2475,20 @@ pub enum AdditionalOpt {
   TrackingIds,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum QueryStr {
   Raw(String),
   Cooked(Vec<QueryOpr>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum QueryOpr {
   Search(SearchOpr),
   Bool(BoolOpr),
   Group(GroupOpr),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SearchOpr {
   Is(Is),
   Owner(String),
